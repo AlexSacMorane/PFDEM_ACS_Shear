@@ -124,6 +124,6 @@ simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample'
 dict_sample['i_DEM'] = 0
 
 #shear sample
-Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
 simulation_report.tac_tempo(datetime.now(), 'Shearing')
