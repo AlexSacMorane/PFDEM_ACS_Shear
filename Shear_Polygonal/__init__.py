@@ -16,10 +16,12 @@ import math
 import matplotlib.pyplot as plt
 
 #Own
+from Grain import Grain, Grain_Image
+import Contact_gg
+import Contact_gimage
+
+#to delete
 import Create_IC_Polygonal
-from Create_IC_Polygonal.Grain_ic_polygonal import Grain_Tempo_Polygonal, Grain_Image_Polygonal
-import Create_IC_Polygonal.Contact_gg_ic_polygonal
-import Create_IC_Polygonal.Contact_gimage_ic_polygonal
 
 #-------------------------------------------------------------------------------
 #Function
@@ -77,7 +79,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                     if image.position == 'right' :
                         image.position = 'left'
                 else : #image does not exist
-                    dict_sample['L_g_image'].append(Grain_Image_Polygonal(grain, 'left'))
+                    dict_sample['L_g_image'].append(Grain_Image(grain, 'left'))
                     dict_sample['L_i_image'].append(grain.id)
             #right wall
             elif (dict_sample['x_box_max'] - grain.center[0]) < dict_algorithm['d_to_image'] :
@@ -86,7 +88,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                     if image.position == 'left' :
                         image.position = 'right'
                 else : #image does not exist
-                    dict_sample['L_g_image'].append(Grain_Image_Polygonal(grain, 'right'))
+                    dict_sample['L_g_image'].append(Grain_Image(grain, 'right'))
                     dict_sample['L_i_image'].append(grain.id)
             #center
             else :
@@ -111,10 +113,10 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
 
         #Contact detection
         if (dict_sample['i_DEM']-i_DEM_0-1) % dict_sample['i_update_neighborhoods_com']  == 0:
-            Create_IC_Polygonal.Contact_gg_ic_polygonal.Update_Neighborhoods(dict_sample)
-            Create_IC_Polygonal.Contact_gimage_ic_polygonal.Update_Neighborhoods(dict_sample)
-        Create_IC_Polygonal.Contact_gg_ic_polygonal.Grains_contact_Neighborhoods(dict_sample,dict_material)
-        Create_IC_Polygonal.Contact_gimage_ic_polygonal.Grains_contact_Neighborhoods(dict_sample,dict_material)
+            Contact_gg.Update_Neighborhoods(dict_sample)
+            Contact_gimage.Update_Neighborhoods(dict_sample)
+        Contact_gg.Grains_contact_Neighborhoods(dict_sample,dict_material)
+        Contact_gimage.Grains_contact_Neighborhoods(dict_sample,dict_material)
 
         #Sollicitation computation
         for grain in dict_sample['L_g_tempo']:
