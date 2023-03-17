@@ -141,8 +141,6 @@ def All_parameters():
     'dt_DEM' : dt_DEM,
     'i_update_neighborhoods': i_update_neighborhoods,
     'd_to_image' : d_to_image,
-    'i_DEM_stop' : i_DEM_stop,
-    'n_t_PFDEM' : n_t_PFDEM,
     'Spring_type' : Spring_type,
     'np_proc' : np_proc,
     'Debug' : Debug,
@@ -163,7 +161,7 @@ def All_parameters():
     factor_ymax_box = 1.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
     i_DEM_stop_IC = 4000 #stop criteria for DEM during IC
-    Debug_DEM_IC = True #plot configuration inside DEM during IC
+    Debug_DEM_IC = False #plot configuration inside DEM during IC
     i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
     dt_DEM_IC = dt_DEM_crit/6 #s time step during IC
     Ecin_ratio_IC = 0.0005
