@@ -13,15 +13,13 @@ This file contains functions used in the simulation.
 import numpy as np
 import random
 import math
-import matplotlib.pyplot as plt
 
 #Own
 from Grain import Grain, Grain_Image
 import Contact_gg
 import Contact_gimage
-
-#to delete
-import Create_IC_Polygonal
+import Owntools
+import Owntools.Plot
 
 #-------------------------------------------------------------------------------
 #Function
@@ -43,16 +41,16 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     i_DEM_0 = dict_sample['i_DEM']
     Shear_strain = 0
     #compute the sample height
-    min_value = min(dict_sample['L_g_tempo'][0].l_border_y)
-    max_value = max(dict_sample['L_g_tempo'][0].l_border_y)
-    for grain in dict_sample['L_g_tempo']:
+    min_value = min(dict_sample['L_g'][0].l_border_y)
+    max_value = max(dict_sample['L_g'][0].l_border_y)
+    for grain in dict_sample['L_g']:
         if min(grain.l_border_y) < min_value :
             min_value = min(grain.l_border_y)
         if max(grain.l_border_y) > max_value :
             max_value = max(grain.l_border_y)
     Sample_height = max_value - min_value
     #track total displacement of grains
-    for grain in dict_sample['L_g_tempo'] :
+    for grain in dict_sample['L_g'] :
         grain.track_u = True
         grain.total_ux = 0
         grain.total_uy = 0
@@ -71,7 +69,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         dict_sample['i_DEM'] = dict_sample['i_DEM'] + 1
 
         #create image
-        for grain in dict_sample['L_g_tempo']:
+        for grain in dict_sample['L_g']:
             #left wall
             if (grain.center[0] - dict_sample['x_box_min']) < dict_algorithm['d_to_image'] :
                 if grain.id in dict_sample['L_i_image'] : #image exists
@@ -119,7 +117,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         Contact_gimage.Grains_contact_Neighborhoods(dict_sample,dict_material)
 
         #Sollicitation computation
-        for grain in dict_sample['L_g_tempo']:
+        for grain in dict_sample['L_g']:
              grain.init_F_control(dict_sollicitation['gravity'])
         for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']+dict_sample['L_contact_gw']:
             contact.normal()
@@ -144,12 +142,12 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             dict_sample['L_contact_ij_gimage'].pop(i_toremove)
 
         #Move grains (only Current)
-        for grain in dict_sample['L_g_tempo']:
+        for grain in dict_sample['L_g']:
             if grain.group == 'Current' :
                 grain.euler_semi_implicite(dict_sample['dt_DEM_IC'],10*dict_sample['Ecin_ratio_IC'])
 
         #periodic condition
-        for grain in dict_sample['L_g_tempo']:
+        for grain in dict_sample['L_g']:
             #left wall
             if grain.center[0] < dict_sample['x_box_min'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
@@ -157,9 +155,9 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                     grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
                     grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_max'] - dict_sample['x_box_min']
                 #contact gimage needed to be convert into gg
-                Create_IC_Polygonal.convert_gimage_into_gg(grain, dict_sample, dict_material)
+                Owntools.convert_gimage_into_gg(grain, dict_sample, dict_material)
                 #contact gg needed to be convert into gimage
-                Create_IC_Polygonal.convert_gg_into_gimage(grain, dict_sample, dict_material)
+                Owntools.convert_gg_into_gimage(grain, dict_sample, dict_material)
             #right wall
             elif grain.center[0] > dict_sample['x_box_max'] :
                 grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
@@ -167,32 +165,32 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                     grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
                     grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_min'] - dict_sample['x_box_max']
                 #contact gimage needed to be convert into gg
-                Create_IC_Polygonal.convert_gimage_into_gg(grain, dict_sample, dict_material)
+                Owntools.convert_gimage_into_gg(grain, dict_sample, dict_material)
                 #contact gg needed to be convert into gimage
-                Create_IC_Polygonal.convert_gg_into_gimage(grain, dict_sample, dict_material)
+                Owntools.convert_gg_into_gimage(grain, dict_sample, dict_material)
 
         #Control the top group to have the pressure target
-        dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g_tempo'])
+        dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g'])
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
-        for grain in dict_sample['L_g_tempo'] :
+        for grain in dict_sample['L_g'] :
             if grain.group == 'Top':
                 grain.move_as_a_group(np.array([dict_sollicitation['Shear_velocity']*dict_sample['dt_DEM_IC'], dy_top]), dict_sample['dt_DEM_IC'])
         #Update shear strain
         Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_sample['dt_DEM_IC'] / Sample_height
 
-        if dict_sample['i_DEM'] % dict_sample['i_print_plot_IC'] == 0:
+        if dict_sample['i_DEM'] % dict_sample['i_print_plot'] == 0:
             print('i_DEM',dict_sample['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
             if dict_sample['Debug_DEM'] :
-                Plot_Config_Loaded(dict_sample,dict_sample['i_DEM'])
+                Owntools.Plot_Config_Loaded(dict_sample,dict_sample['i_DEM'])
 
         #Check stop conditions for DEM
         if Shear_strain >= dict_sollicitation['Shear_strain_target'] :
              DEM_loop_statut = False
-        if dict_sample['L_g_tempo'] == []:
+        if dict_sample['L_g'] == []:
             DEM_loop_statut = False
 
     #plot total displacement field
-    Plot_total_U(dict_sample)
+    Owntools.Plot_total_U(dict_sample)
 
 #-------------------------------------------------------------------------------
 
@@ -303,65 +301,3 @@ def Reset_y_max(L_g):
             n_grain = n_grain + 1
     dy_top = - R_mean / n_grain / 20
     return dy_top
-
-#-------------------------------------------------------------------------------
-
-def Plot_Config_Loaded(dict_sample,i):
-    """
-    Plot loaded configuration.
-
-        Input :
-            a list of temporary grain (a list)
-            the coordinates of the walls (four floats)
-            an iteration (a int)
-        Output :
-            Nothing, but a .png file is generated (a file)
-    """
-    L_color_group = ['k','r','b']
-    L_group = ['Current', 'Bottom', 'Top']
-    plt.figure(1,figsize=(16,9))
-    for grain in dict_sample['L_g_tempo']:
-        for i_group in range(len(L_group)):
-            if grain.group == L_group[i_group] :
-                plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
-    for grain in dict_sample['L_g_image']:
-        for i_group in range(len(L_group)):
-            if grain.group == L_group[i_group]:
-                plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
-    plt.axis('equal')
-    plt.savefig('Debug/Configuration/Shear/Config_Loaded_'+str(i)+'.png')
-    plt.close(1)
-
-#-------------------------------------------------------------------------------
-
-def Plot_total_U(dict_sample):
-    """
-    Plot the map of the total displacement tracked.
-
-        Input :
-            a list of temporary grain (a list)
-        Output :
-            Nothing, but a .png file is generated (a file)
-    """
-    L_color_group = ['k','r','b']
-    L_group = ['Current', 'Bottom', 'Top']
-    plt.figure(1,figsize=(16,9))
-    x_L = []
-    y_L = []
-    u_L = []
-    v_L = []
-    for grain in dict_sample['L_g_tempo']:
-        for i_group in range(len(L_group)):
-            if grain.group == L_group[i_group] :
-                plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
-        if grain.group == 'Current' :
-            x_L.append(grain.center[0])
-            y_L.append(grain.center[1])
-            u_L.append(grain.total_ux)
-            v_L.append(grain.total_uy)
-    plt.quiver(x_L,y_L,u_L,v_L)
-    plt.axis('equal')
-    plt.savefig('Debug/Configuration/Total_U_Sheared.png')
-    plt.close(1)
-
-#-------------------------------------------------------------------------------
