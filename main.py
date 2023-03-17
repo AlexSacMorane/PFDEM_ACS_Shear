@@ -20,6 +20,9 @@ import matplotlib.pyplot as plt
 #Own function and class
 import Create_IC
 import Create_IC_Polygonal
+import Contact_gg
+import Contact_gimage
+import Grain
 import Shear_Polygonal
 import Report
 import User
@@ -32,9 +35,6 @@ if Path('Debug').exists():
     shutil.rmtree('Debug')
 os.mkdir('Debug')
 os.mkdir('Debug/Configuration')
-os.mkdir('Debug/Configuration/Init_disks')
-os.mkdir('Debug/Configuration/Init_polygons')
-os.mkdir('Debug/Configuration/Shear')
 
 simulation_report = Report.Report('Debug/Report.txt',datetime.now())
 simulation_report.tic_tempo(datetime.now())
@@ -43,12 +43,19 @@ simulation_report.tic_tempo(datetime.now())
 dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
 
 #find name
-i_run = 1
-folderpath = Path('ICs/'+dict_algorithm['template_simulation_name']+str(i_run)+'_dict_ic')
-while folderpath.exists():
-    i_run = i_run + 1
-    folderpath = Path('ICs/'+dict_algorithm['template_simulation_name']+str(i_run)+'_dict_ic')
-dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i_run)
+if dict_algorithm['SaveData'] :
+    #check if save folder exists
+    if not Path('../'+dict_algorithm['main_folder_name']).exists():
+        shutil.mkdir('../'+dict_algorithm['main_folder_name'])
+
+    i_run = 1
+    folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
+    while folderpath.exists():
+        i_run = i_run + 1
+        folderpath = Path('../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['template_simulation_name']+str(i_run))
+    dict_algorithm['name_folder'] = dict_algorithm['template_simulation_name']+str(i_run)
+else :
+    dict_algorithm['name_folder'] = 'One_Run'
 
 #initial ic
 Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
@@ -66,7 +73,7 @@ dict_ic['i_print_plot_IC'] = 100
 
 simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample')
 
-dict_ic = Create_IC_Polygonal.Discretize_Grains(dict_ic, 60) #overwrite sphere dict_ic
+dict_ic = Create_IC_Polygonal.Discretize_Grains(dict_ic, 80) #overwrite sphere dict_ic
 
 simulation_report.tac_tempo(datetime.now(), 'From disks to polygons')
 simulation_report.tic_tempo(datetime.now())
@@ -110,12 +117,19 @@ dict_ic['L_contact_gw_ij'] = []
 simulation_report.tac_tempo(datetime.now(), 'Define groups')
 
 #-------------------------------------------------------------------------------
+#From ic to current
+#-------------------------------------------------------------------------------
+
+#make conversion
+
+#-------------------------------------------------------------------------------
 #Shear simulation
 #-------------------------------------------------------------------------------
 
 #change Parameters
 simulation_report.tic_tempo(datetime.now())
 simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
+dict_sample['i_DEM'] = 0
 
 #shear sample
 Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)

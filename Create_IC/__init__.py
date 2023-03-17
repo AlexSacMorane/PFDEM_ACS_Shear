@@ -407,7 +407,7 @@ def convert_gimage_into_gg(grain, dict_ic, dict_material):
                 #transmit data
                 dict_ic['L_contact'][-1].convert_gimage_in_gg(dict_ic['L_contact_gimage'][i_contact_gimage])
                 #update neighborhood
-                grain_i.neighbourood.append(grain_j)
+                grain_i.neighborhood.append(grain_j)
             L_i_contact_to_delete.append(i_contact_gimage)
     #delete previous contact gimage
     L_i_contact_to_delete.reverse()
@@ -452,7 +452,7 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
                 #transmit data
                 dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
                 #update neighborhood
-                grain.neighbourood_image.append(image)
+                grain.neighborhood_image.append(image)
 
             #contact gimage 2
             ij_gimage = (ij_gg[1], ij_gg[0])
@@ -475,7 +475,7 @@ def convert_gg_into_gimage(grain, dict_ic, dict_material):
                 #transmit data
                 dict_ic['L_contact_gimage'][-1].convert_gimage_in_gg(dict_ic['L_contact'][i_contact_ij])
                 #update neighborhood
-                grain.neighbourood_image.append(image)
+                grain.neighborhood_image.append(image)
 
             L_i_contact_to_delete.append(i_contact_ij)
     #delete previous contact gimage

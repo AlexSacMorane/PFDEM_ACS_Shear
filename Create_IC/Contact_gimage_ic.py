@@ -216,7 +216,7 @@ def Update_Neighborhoods(dict_ic):
         for image in dict_ic['L_g_image']:
             if np.linalg.norm(grain.center-image.center) < dict_ic['factor_neighborhood_IC']*(grain.radius+image.radius):
                 neighborhood.append(image)
-        grain.neighbourood_image = neighborhood
+        grain.neighborhood_image = neighborhood
 
 #-------------------------------------------------------------------------------
 
@@ -234,7 +234,7 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
     """
     for i_grain in range(len(dict_ic['L_g_tempo'])) :
         grain = dict_ic['L_g_tempo'][i_grain]
-        for neighbor in grain.neighbourood_image:
+        for neighbor in grain.neighborhood_image:
             j_grain = neighbor.id
             image = neighbor
             if Grains_contact_f(grain,image):

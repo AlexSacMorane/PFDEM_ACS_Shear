@@ -326,7 +326,7 @@ def Update_Neighborhoods(dict_ic):
 
     This function is called every x time step. The contact is determined by Grains_contact_Neighborhoods().
     Notice that if there is a potential contact between grain_i and grain_j, grain_i is not in the neighborhood of grain_j.
-    Whereas grain_j is in the neighbourood of grain_i. With i_grain < j_grain.
+    Whereas grain_j is in the neighborhood of grain_i. With i_grain < j_grain.
 
         Input :
             an initial condition dictionnary (a dict)
@@ -338,15 +338,15 @@ def Update_Neighborhoods(dict_ic):
         for image in dict_ic['L_g_image']:
             if np.linalg.norm(grain.center-image.center) < dict_ic['factor_neighborhood_IC']*(grain.r_max+image.r_max):
                 neighborhood.append(image)
-        grain.neighbourood_image = neighborhood
+        grain.neighborhood_image = neighborhood
 
 #-------------------------------------------------------------------------------
 
 def Grains_contact_Neighborhoods(dict_ic,dict_material):
     """
-    Detect contact between a grain and grains from its neighbourood.
+    Detect contact between a grain and grains from its neighborhood.
 
-    The neighbourood is updated with Update_Neighbouroods().
+    The neighborhood is updated with Update_neighborhoods().
 
         Input :
             an initial condition dictionnary (a dict)
@@ -356,7 +356,7 @@ def Grains_contact_Neighborhoods(dict_ic,dict_material):
     """
     for i_grain in range(len(dict_ic['L_g_tempo'])) :
         grain = dict_ic['L_g_tempo'][i_grain]
-        for neighbor in grain.neighbourood_image:
+        for neighbor in grain.neighborhood_image:
             j_neighbor = neighbor.id
             image = neighbor
             if Grains_Polyhedral_contact_f(grain,image):

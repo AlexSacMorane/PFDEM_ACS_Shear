@@ -60,12 +60,11 @@ def All_parameters():
     nu = 0.3 #Poisson's ratio
     rho = 2500*10**(-6*3) #density kg/µm3
     rho_surf_disk = 4/3*rho*R_mean #kg/µm2
-    mu_friction_gg = 0.5 #grain-grain
-    mu_friction_gw = 0 #grain-wall
+    mu_friction = 0.5 #grain-grain
     coeff_restitution = 0.2 #1 is perfect elastic
     # PF parameters
     M_pf = 1 # mobility
-    kc_pf = 3 #graident coefficient
+    kc_pf = 3 #gradient coefficient
 
     #write dict
     dict_material = {
@@ -73,8 +72,7 @@ def All_parameters():
     'nu' : nu,
     'rho' : rho,
     'rho_surf' : rho_surf_disk,
-    'mu_friction_gg' : mu_friction_gg,
-    'mu_friction_gw' : mu_friction_gw,
+    'mu_friction' : mu_friction,
     'coeff_restitution' : coeff_restitution,
     'M_pf' : M_pf,
     'kc_pf' : kc_pf
@@ -103,7 +101,6 @@ def All_parameters():
     dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF-DEM
     factor_distribution_etai = 1.5 #margin to distribute etai
-    MovePF_selector = 'DeconstructRebuild' #Move PF
     n_local = 40 #number of node inside local PF simulation
     dx_local = 2*min(dict_geometry['L_R'])/(n_local-1)
     dy_local = 2*min(dict_geometry['L_R'])/(n_local-1)
@@ -117,22 +114,16 @@ def All_parameters():
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 100 #the frequency of the update of the neighborhood of the grains and the walls
+    i_update_neighborhoods = 50 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
     d_to_image = 2 * max(L_R)
-    #Stop criteria of the DEM
-    i_DEM_stop = 3000 #maximum iteration for one DEM simulation
-    Ecin_ratio = 0.0002
-
-    #PF-DEM
-    n_t_PFDEM = 10 #number of cycle PF-DEM
 
     #Number of processor
     np_proc = 4
 
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
-    Debug_DEM = True #plot configuration inside DEM
+    Debug_DEM = False #plot configuration inside DEM
     i_print_plot = 100 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
@@ -151,9 +142,7 @@ def All_parameters():
     'i_update_neighborhoods': i_update_neighborhoods,
     'd_to_image' : d_to_image,
     'i_DEM_stop' : i_DEM_stop,
-    'Ecin_ratio' : Ecin_ratio,
     'n_t_PFDEM' : n_t_PFDEM,
-    'MovePF_selector' : MovePF_selector,
     'Spring_type' : Spring_type,
     'np_proc' : np_proc,
     'Debug' : Debug,
@@ -204,10 +193,10 @@ def All_parameters():
     gravity = 0 #µm/s2
 
     #Confinement load
-    Vertical_Confinement_Linear_Force = Y*2*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    Vertical_Confinement_Linear_Force = Y*4*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
 
-    #shear
+    #Shear
     U_shear = R_mean / 100
     Shear_velocity = U_shear/dt_DEM_IC
     Shear_strain_target = 1.5 #total shear displacement / initial sample height

@@ -3,7 +3,7 @@
 @author: Alexandre Sac--Morane
 alexandre.sac-morane@uclouvain.be
 
-This file contains ??.nt functions used in the simulation.
+This file contains functions used in the simulation to define a contact grain-image.
 """
 
 #-------------------------------------------------------------------------------
@@ -14,51 +14,51 @@ import numpy as np
 import math
 
 #Own
-import Create_IC_Polygonal.Grain_ic_polygonal
+import Grain
 
 #-------------------------------------------------------------------------------
 #Class
 #-------------------------------------------------------------------------------
 
-class Contact_Tempo_Polygonal:
+class Contact_Image:
   """
-  A temporary contact grain - grain used to generated an initial condition.
+  A contact grain - image used to simulate the grains interactions with the periodic conditions.
   """
 
 #-------------------------------------------------------------------------------
 
   def __init__(self, ID, G1, G2, dict_material):
     """
-    Defining the contact grain-grain.
+    Defining the contact grain-image.
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact_image)
             an id (a int)
-            two grains (two grain_tempos)
+            two grains (two grains)
             a material dictionnary (a dict)
         Output :
-            Nothing, but the contact grain - grain is generated (a contact_tempo)
+            Nothing, but the contact grain - image is generated (a contact_image)
     """
     self.id = ID
     self.g1 = G1
     self.g2 = G2
     self.ft = 0
-    self.mu = 0
+    self.mu = dict_material['mu_friction']
     self.coeff_restitution = dict_material['coeff_restitution']
     self.tangential_old_statut = False
     self.overlap_tangential = 0
 
 #-------------------------------------------------------------------------------
 
-  def convert_gimage_in_gg(self, other):
+  def convert_gg_in_gimage(self, other):
     """
-    Convert a contact grain-image in a contact grain-grain.
+    Convert a contact grain-grain in a contact grain-image.
 
         Input :
-            itself (a contact_tempo)
-            a contact grain-image (a contact_gimage)
+            itself (a contact_image)
+            a contact grain-grain (a contact)
         Output :
-            Nothing, but data from the contact gimage are transmitted to the contact gg
+            Nothing, but data from the contact gg are transmitted to the contact gimage
     """
     self.ft = other.ft
     self.tangential_old_statut = other.tangential_old_statut
@@ -75,12 +75,12 @@ class Contact_Tempo_Polygonal:
 
   def normal(self):
     """
-    Compute the normal reaction of a contact grain-grain.
+    Compute the normal reaction of a contact grain-image.
 
     Here a pontual spring is considered.
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact_image)
         Output :
             Nothing, but attributes are updated
     """
@@ -199,7 +199,7 @@ class Contact_Tempo_Polygonal:
         self.F_2_1_n = F_2_1_n
         self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
         self.g1.add_F( F_2_1, self.g1.l_border[:-1][ij_min[0]])
-        self.g2.add_F(-F_2_1, self.g2.l_border[:-1][ij_min[1]])
+        #no force on G2 because it is an image
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -209,7 +209,7 @@ class Contact_Tempo_Polygonal:
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
         self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][ij_min[0]])
-        self.g2.add_F(-F_2_1_damp, self.g2.l_border[:-1][ij_min[1]])
+        #no force on G2 because it is an image
 
     #no contact finally
     else :
@@ -221,12 +221,12 @@ class Contact_Tempo_Polygonal:
 
   def tangential(self,dt_DEM):
     """
-    Compute the tangential reaction of a contact grain-grain.
+    Compute the tangential reaction of a contact grain-image.
 
     Here a pontual spring is considered
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact_image)
             a time step (a float)
         Output :
             Nothing, but attributes are updated
@@ -253,9 +253,8 @@ class Contact_Tempo_Polygonal:
         self.tangential_old = self.pc_tangential
         if abs(self.ft) > abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
             self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
-
         self.g1.add_F( self.ft*self.pc_tangential, self.g1.l_border[:-1][self.ij_min[0]])
-        self.g2.add_F(-self.ft*self.pc_tangential, self.g2.l_border[:-1][self.ij_min[1]])
+        #no force on G2 because it is an image
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -265,7 +264,7 @@ class Contact_Tempo_Polygonal:
         F_2_1_damp = F_2_1_damp_t *self.pc_tangential
         self.ft_damp = F_2_1_damp_t
         self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][self.ij_min[0]])
-        self.g2.add_F(-F_2_1_damp, self.g2.l_border[:-1][self.ij_min[1]])
+        #no force on G2 because it is an image
 
     #no contact finally
     else :
@@ -280,12 +279,13 @@ class Contact_Tempo_Polygonal:
 
 def Grains_Polyhedral_contact_f(g1,g2):
   """
-  Detect the contact grain-grain.
+  Detect the contact grain-image.
 
     Input :
-        two temporary grains (two grain_tempos)
+        a grain
+        a grain image
     Output :
-        a Boolean, True if there is contaxct between the twwo grains (a Boolean)
+        a Boolean, True if there is contact between the twwo grains (a Boolean)
   """
   if np.linalg.norm(g1.center-g2.center) < 1.5*(g1.r_max+g2.r_max):
       #compute angle between grains
@@ -320,7 +320,7 @@ def Grains_Polyhedral_contact_f(g1,g2):
 
 #-------------------------------------------------------------------------------
 
-def Update_Neighborhoods(dict_ic):
+def Update_Neighborhoods(dict_algorithm, dict_sample):
     """
     Determine a neighborhood for each grain.
 
@@ -329,46 +329,48 @@ def Update_Neighborhoods(dict_ic):
     Whereas grain_j is in the neighborhood of grain_i. With i_grain < j_grain.
 
         Input :
-            an initial condition dictionnary (a dict)
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
         Output :
             Nothing, but the neighborhood of the temporary grains is updated
     """
-    for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
+    for grain in dict_sample['L_g'] :
         neighborhood = []
-        for j_grain in range(i_grain+1,len(dict_ic['L_g_tempo'])):
-            if np.linalg.norm(dict_ic['L_g_tempo'][i_grain].center-dict_ic['L_g_tempo'][j_grain].center) < dict_ic['factor_neighborhood_IC']*(dict_ic['L_g_tempo'][i_grain].r_max+dict_ic['L_g_tempo'][j_grain].r_max):
-                neighborhood.append(dict_ic['L_g_tempo'][j_grain])
-        dict_ic['L_g_tempo'][i_grain].neighborhood = neighborhood
+        for image in dict_sample['L_g_image']:
+            if np.linalg.norm(grain.center-image.center) < dict_algorithm['factor_neighborhood']*(grain.r_max+image.r_max):
+                neighborhood.append(image)
+        grain.neighborhood_image = neighborhood
 
 #-------------------------------------------------------------------------------
 
-def Grains_contact_Neighborhoods(dict_ic,dict_material):
+def Grains_contact_Neighborhoods(dict_sample,dict_material):
     """
     Detect contact between a grain and grains from its neighborhood.
 
     The neighborhood is updated with Update_neighborhoods().
 
         Input :
-            an initial condition dictionnary (a dict)
+            a sample dictionnary (a dict)
             a material dictionnary (a dict)
         Output :
             Nothing, but the initial condition dictionnary is updated with grain - grain contacts
     """
-    for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
-        grain_i = dict_ic['L_g_tempo'][i_grain]
-        for neighbour in dict_ic['L_g_tempo'][i_grain].neighborhood:
-            grain_j = neighbour
-            if Grains_Polyhedral_contact_f(grain_i,grain_j):
-                if (grain_i.id, grain_j.id) not in dict_ic['L_contact_ij']:  #contact not detected previously
+    for i_grain in range(len(dict_sample['L_g'])) :
+        grain = dict_sample['L_g'][i_grain]
+        for neighbor in grain.neighborhood_image:
+            j_neighbor = neighbor.id
+            image = neighbor
+            if Grains_Polyhedral_contact_f(grain,image):
+                if (grain.id, image.id) not in dict_sample['L_contact_ij_gimage']:  #contact not detected previously
                    #creation of contact
-                   dict_ic['L_contact_ij'].append((grain_i.id, grain_j.id))
-                   dict_ic['L_contact'].append(Contact_Tempo_Polygonal(dict_ic['id_contact'], grain_i, grain_j, dict_material))
-                   dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                   dict_sample['L_contact_ij_gimage'].append((grain.id, image.id))
+                   dict_sample['L_contact_gimage'].append(Contact_Image(dict_sample['id_contact'], grain, image, dict_material))
+                   dict_sample['id_contact'] = dict_sample['id_contact'] + 1
 
             else :
-                if (grain_i.id, grain_j.id) in dict_ic['L_contact_ij'] : #contact detected previously is not anymore
-                       dict_ic['L_contact'].pop(dict_ic['L_contact_ij'].index((grain_i.id, grain_j.id)))
-                       dict_ic['L_contact_ij'].remove((grain_i.id, grain_j.id))
+                if (grain.id, image.id) in dict_sample['L_contact_ij_gimage'] : #contact detected previously is not anymore
+                       dict_sample['L_contact_gimage'].pop(dict_sample['L_contact_ij_gimage'].index((grain.id, image.id)))
+                       dict_sample['L_contact_ij_gimage'].remove((grain.id, image.id))
 
 #-------------------------------------------------------------------------------
 
@@ -377,7 +379,7 @@ def extract_vertices(g, angle_g_to_other_g) :
     Extract a list of indices of vertices inside a angular window.
 
         Input :
-            a grain (a grain)
+            a grain (a grain or an image)
             an angle (a float)
         Output :
             a list of indices (a list)

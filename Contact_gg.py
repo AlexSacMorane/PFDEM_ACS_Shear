@@ -3,7 +3,7 @@
 @author: Alexandre Sac--Morane
 alexandre.sac-morane@uclouvain.be
 
-This file contains ??.nt functions used in the simulation.
+This file contains functions used in the simulation to define a contact grain-grain.
 """
 
 #-------------------------------------------------------------------------------
@@ -14,15 +14,15 @@ import numpy as np
 import math
 
 #Own
-import Create_IC_Polygonal.Grain_ic_polygonal
+import Grain
 
 #-------------------------------------------------------------------------------
 #Class
 #-------------------------------------------------------------------------------
 
-class Contact_Tempo_Polygonal:
+class Contact:
   """
-  A temporary contact grain - grain used to generated an initial condition.
+  A contact grain - grain used to simulate the grains interactions.
   """
 
 #-------------------------------------------------------------------------------
@@ -32,18 +32,18 @@ class Contact_Tempo_Polygonal:
     Defining the contact grain-grain.
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact)
             an id (a int)
-            two grains (two grain_tempos)
+            two grains (two grains)
             a material dictionnary (a dict)
         Output :
-            Nothing, but the contact grain - grain is generated (a contact_tempo)
+            Nothing, but the contact grain - grain is generated (a contact)
     """
     self.id = ID
     self.g1 = G1
     self.g2 = G2
     self.ft = 0
-    self.mu = 0
+    self.mu = dict_material['mu_friction']
     self.coeff_restitution = dict_material['coeff_restitution']
     self.tangential_old_statut = False
     self.overlap_tangential = 0
@@ -55,7 +55,7 @@ class Contact_Tempo_Polygonal:
     Convert a contact grain-image in a contact grain-grain.
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact)
             a contact grain-image (a contact_gimage)
         Output :
             Nothing, but data from the contact gimage are transmitted to the contact gg
@@ -80,7 +80,7 @@ class Contact_Tempo_Polygonal:
     Here a pontual spring is considered.
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact)
         Output :
             Nothing, but attributes are updated
     """
@@ -226,7 +226,7 @@ class Contact_Tempo_Polygonal:
     Here a pontual spring is considered
 
         Input :
-            itself (a contact_tempo)
+            itself (a contact)
             a time step (a float)
         Output :
             Nothing, but attributes are updated
@@ -283,7 +283,7 @@ def Grains_Polyhedral_contact_f(g1,g2):
   Detect the contact grain-grain.
 
     Input :
-        two temporary grains (two grain_tempos)
+        two grains (two grains)
     Output :
         a Boolean, True if there is contaxct between the twwo grains (a Boolean)
   """
@@ -320,7 +320,7 @@ def Grains_Polyhedral_contact_f(g1,g2):
 
 #-------------------------------------------------------------------------------
 
-def Update_Neighborhoods(dict_ic):
+def Update_Neighborhoods(dict_algorithm, dict_sample):
     """
     Determine a neighborhood for each grain.
 
@@ -329,46 +329,47 @@ def Update_Neighborhoods(dict_ic):
     Whereas grain_j is in the neighborhood of grain_i. With i_grain < j_grain.
 
         Input :
-            an initial condition dictionnary (a dict)
+            an algorithm dictionnary (a dict)
+            a sample dictionnary (a dict)
         Output :
-            Nothing, but the neighborhood of the temporary grains is updated
+            Nothing, but the neighborhood of the grains is updated
     """
-    for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
+    for i_grain in range(len(dict_sample['L_g'])-1) :
         neighborhood = []
-        for j_grain in range(i_grain+1,len(dict_ic['L_g_tempo'])):
-            if np.linalg.norm(dict_ic['L_g_tempo'][i_grain].center-dict_ic['L_g_tempo'][j_grain].center) < dict_ic['factor_neighborhood_IC']*(dict_ic['L_g_tempo'][i_grain].r_max+dict_ic['L_g_tempo'][j_grain].r_max):
-                neighborhood.append(dict_ic['L_g_tempo'][j_grain])
-        dict_ic['L_g_tempo'][i_grain].neighborhood = neighborhood
+        for j_grain in range(i_grain+1,len(dict_sample['L_g'])):
+            if np.linalg.norm(dict_sample['L_g'][i_grain].center-dict_sample['L_g'][j_grain].center) < dict_algorithm['factor_neighborhood']*(dict_sample['L_g'][i_grain].r_max+dict_sample['L_g'][j_grain].r_max):
+                neighborhood.append(dict_sample['L_g'][j_grain])
+        dict_sample['L_g'][i_grain].neighborhood = neighborhood
 
 #-------------------------------------------------------------------------------
 
-def Grains_contact_Neighborhoods(dict_ic,dict_material):
+def Grains_contact_Neighborhoods(dict_sample, dict_material):
     """
     Detect contact between a grain and grains from its neighborhood.
 
     The neighborhood is updated with Update_neighborhoods().
 
         Input :
-            an initial condition dictionnary (a dict)
+            a sample dictionnary (a dict)
             a material dictionnary (a dict)
         Output :
-            Nothing, but the initial condition dictionnary is updated with grain - grain contacts
+            Nothing, but the sample dictionnary is updated with grain - grain contacts
     """
-    for i_grain in range(len(dict_ic['L_g_tempo'])-1) :
-        grain_i = dict_ic['L_g_tempo'][i_grain]
-        for neighbour in dict_ic['L_g_tempo'][i_grain].neighborhood:
+    for i_grain in range(len(dict_sample['L_g'])-1) :
+        grain_i = dict_sample['L_g'][i_grain]
+        for neighbour in dict_sample['L_g'][i_grain].neighborhood:
             grain_j = neighbour
             if Grains_Polyhedral_contact_f(grain_i,grain_j):
-                if (grain_i.id, grain_j.id) not in dict_ic['L_contact_ij']:  #contact not detected previously
+                if (grain_i.id, grain_j.id) not in dict_sample['L_contact_ij']:  #contact not detected previously
                    #creation of contact
-                   dict_ic['L_contact_ij'].append((grain_i.id, grain_j.id))
-                   dict_ic['L_contact'].append(Contact_Tempo_Polygonal(dict_ic['id_contact'], grain_i, grain_j, dict_material))
-                   dict_ic['id_contact'] = dict_ic['id_contact'] + 1
+                   dict_sample['L_contact_ij'].append((grain_i.id, grain_j.id))
+                   dict_sample['L_contact'].append(Contact_Tempo_Polygonal(dict_sample['id_contact'], grain_i, grain_j, dict_material))
+                   dict_sample['id_contact'] = dict_sample['id_contact'] + 1
 
             else :
-                if (grain_i.id, grain_j.id) in dict_ic['L_contact_ij'] : #contact detected previously is not anymore
-                       dict_ic['L_contact'].pop(dict_ic['L_contact_ij'].index((grain_i.id, grain_j.id)))
-                       dict_ic['L_contact_ij'].remove((grain_i.id, grain_j.id))
+                if (grain_i.id, grain_j.id) in dict_sample['L_contact_ij'] : #contact detected previously is not anymore
+                       dict_sample['L_contact'].pop(dict_sample['L_contact_ij'].index((grain_i.id, grain_j.id)))
+                       dict_sample['L_contact_ij'].remove((grain_i.id, grain_j.id))
 
 #-------------------------------------------------------------------------------
 
