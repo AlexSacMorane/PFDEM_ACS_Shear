@@ -18,6 +18,28 @@ import Contact_gimage
 #functions
 #-------------------------------------------------------------------------------
 
+def Plot_Config_Loaded(dict_ic):
+    """
+    Plot group distribution.
+
+        Input :
+            an initial configuration disctionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    L_color_group = ['k','r','b']
+    L_group = ['Current', 'Bottom', 'Top']
+    fig = plt.figure(1,figsize=(16,9.12))
+    for grain in dict_ic['L_g_tempo']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group] :
+                plt.plot(grain.l_border_x, grain.l_border_y, L_color_group[i_group])
+    plt.axis("equal")
+    fig.savefig('Debug/Configuration/Group_Distribution.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def Plot_Config_Loaded(dict_sample,i):
     """
     Plot loaded configuration.

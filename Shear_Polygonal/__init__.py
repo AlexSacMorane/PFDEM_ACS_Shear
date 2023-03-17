@@ -121,7 +121,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
              grain.init_F_control(dict_sollicitation['gravity'])
         for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']+dict_sample['L_contact_gw']:
             contact.normal()
-            contact.tangential(dict_sample['dt_DEM_IC'])
+            contact.tangential(dict_algorithm['dt_DEM'])
 
         #Delete contacts gg and gimage with no overlap
         L_i_toremove = []
@@ -144,7 +144,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         #Move grains (only Current)
         for grain in dict_sample['L_g']:
             if grain.group == 'Current' :
-                grain.euler_semi_implicite(dict_sample['dt_DEM_IC'],10*dict_sample['Ecin_ratio_IC'])
+                grain.euler_semi_implicite(dict_algorithm['dt_DEM'],0.005)
 
         #periodic condition
         for grain in dict_sample['L_g']:
@@ -174,9 +174,9 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
         for grain in dict_sample['L_g'] :
             if grain.group == 'Top':
-                grain.move_as_a_group(np.array([dict_sollicitation['Shear_velocity']*dict_sample['dt_DEM_IC'], dy_top]), dict_sample['dt_DEM_IC'])
+                grain.move_as_a_group(np.array([dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'], dy_top]), dict_algorithm['dt_DEM'])
         #Update shear strain
-        Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_sample['dt_DEM_IC'] / Sample_height
+        Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'] / Sample_height
 
         if dict_sample['i_DEM'] % dict_sample['i_print_plot'] == 0:
             print('i_DEM',dict_sample['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')

@@ -15,7 +15,6 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 import pickle
-import matplotlib.pyplot as plt
 
 #Own function and class
 import Create_IC
@@ -26,6 +25,8 @@ import Grain
 import Shear_Polygonal
 import Report
 import User
+import Owntools
+import Owntools.Plot
 
 #-------------------------------------------------------------------------------
 #IC simulation
@@ -99,16 +100,7 @@ for grain in dict_ic['L_g_tempo'] :
 simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n')
 
 #plot group distribution
-L_color_group = ['k','r','b']
-L_group = ['Current', 'Bottom', 'Top']
-fig = plt.figure(1,figsize=(16,9.12))
-for grain in dict_ic['L_g_tempo']:
-    for i_group in range(len(L_group)):
-        if grain.group == L_group[i_group] :
-            plt.plot(grain.l_border_x, grain.l_border_y, L_color_group[i_group])
-plt.axis("equal")
-fig.savefig('Debug/Configuration/Group_Distribution.png')
-plt.close(1)
+Owntools.Plot.Plot_Config_Loaded(dict_ic)
 
 #delete contact gw
 dict_ic['L_contact_gw'] = []
