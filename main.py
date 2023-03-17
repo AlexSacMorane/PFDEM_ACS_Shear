@@ -29,19 +29,28 @@ import Owntools
 import Owntools.Plot
 
 #-------------------------------------------------------------------------------
-#IC simulation
+#Plan simulation
 #-------------------------------------------------------------------------------
-
-if Path('Debug').exists():
-    shutil.rmtree('Debug')
-os.mkdir('Debug')
-os.mkdir('Debug/Configuration')
-
-simulation_report = Report.Report('Debug/Report.txt',datetime.now())
-simulation_report.tic_tempo(datetime.now())
 
 #get data
 dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
+
+#debug folder
+if Path('Debug').exists():
+    shutil.rmtree('Debug')
+os.mkdir('Debug')
+if dict_algorithm['Debug'] or dict_algorithm['Debug_DEM'] or dict_ic['Debug_DEM_IC'] :
+    if dict_algorithm['Debug'] :
+        os.mkdir('Debug/Configuration')
+    if dict_algorithm['Debug_DEM'] :
+        os.mkdir('Debug/Shear')
+    if dict_ic['Debug_DEM_IC'] :
+        os.mkdir('Debug/Init_disks')
+        os.mkdir('Debug/Init_polygons')
+
+#report
+simulation_report = Report.Report('Debug/Report.txt',datetime.now())
+simulation_report.tic_tempo(datetime.now())
 
 #find name
 if dict_algorithm['SaveData'] :
@@ -58,7 +67,10 @@ if dict_algorithm['SaveData'] :
 else :
     dict_algorithm['name_folder'] = 'One_Run'
 
-#initial ic
+#-------------------------------------------------------------------------------
+#IC simulation
+#-------------------------------------------------------------------------------
+
 Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
 simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
@@ -100,7 +112,7 @@ for grain in dict_ic['L_g_tempo'] :
 simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n')
 
 #plot group distribution
-Owntools.Plot.Plot_Config_Loaded(dict_ic)
+Owntools.Plot.Plot_group_distribution(dict_ic)
 
 #delete contact gw
 dict_ic['L_contact_gw'] = []

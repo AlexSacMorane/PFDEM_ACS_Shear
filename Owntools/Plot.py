@@ -18,7 +18,7 @@ import Contact_gimage
 #functions
 #-------------------------------------------------------------------------------
 
-def Plot_Config_Loaded(dict_ic):
+def Plot_group_distribution(dict_ic):
     """
     Plot group distribution.
 

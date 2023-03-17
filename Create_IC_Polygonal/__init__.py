@@ -554,7 +554,7 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_max],[y_min,y_min],'k')
     plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
-    plt.savefig('Debug/Configuration/Init_polygons/Config_Loaded_'+str(i)+'.png')
+    plt.savefig('Debug/Init_polygons/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
