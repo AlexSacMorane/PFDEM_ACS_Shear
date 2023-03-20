@@ -332,7 +332,7 @@ def Update_Neighborhoods(dict_algorithm, dict_sample):
             an algorithm dictionnary (a dict)
             a sample dictionnary (a dict)
         Output :
-            Nothing, but the neighborhood of the temporary grains is updated
+            Nothing, but the neighborhood of the grains is updated
     """
     for grain in dict_sample['L_g'] :
         neighborhood = []

@@ -98,7 +98,7 @@ def convert_gg_into_gimage(grain, dict_sample, dict_material):
                 dict_sample['L_contact_gimage'].append(Contact_gimage.Contact_Image(dict_sample['id_contact'], grain, image, dict_material))
                 dict_sample['id_contact'] = dict_sample['id_contact'] + 1
                 #transmit data
-                dict_sample['L_contact_gimage'][-1].convert_gimage_in_gg(dict_sample['L_contact'][i_contact_ij])
+                dict_sample['L_contact_gimage'][-1].convert_gg_in_gimage(dict_sample['L_contact'][i_contact_ij])
                 #update neighborhood
                 grain.neighborhood_image.append(image)
 
@@ -118,10 +118,10 @@ def convert_gg_into_gimage(grain, dict_sample, dict_material):
                     image = dict_sample['L_g_image'][i_image]
                 #creation of contact
                 dict_sample['L_contact_ij_gimage'].append(ij_gimage)
-                dict_sample['L_contact_gimage'].append(Create_IC.Contact_gimage_ic.Contact_Image(dict_sample['id_contact'], grain, image, dict_material))
+                dict_sample['L_contact_gimage'].append(Contact_gimage.Contact_Image(dict_sample['id_contact'], grain, image, dict_material))
                 dict_sample['id_contact'] = dict_sample['id_contact'] + 1
                 #transmit data
-                dict_sample['L_contact_gimage'][-1].convert_gimage_in_gg(dict_sample['L_contact'][i_contact_ij])
+                dict_sample['L_contact_gimage'][-1].convert_gg_in_gimage(dict_sample['L_contact'][i_contact_ij])
                 #update neighborhood
                 grain.neighborhood_image.append(image)
 

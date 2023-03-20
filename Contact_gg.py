@@ -363,7 +363,7 @@ def Grains_contact_Neighborhoods(dict_sample, dict_material):
                 if (grain_i.id, grain_j.id) not in dict_sample['L_contact_ij']:  #contact not detected previously
                    #creation of contact
                    dict_sample['L_contact_ij'].append((grain_i.id, grain_j.id))
-                   dict_sample['L_contact'].append(Contact_Tempo_Polygonal(dict_sample['id_contact'], grain_i, grain_j, dict_material))
+                   dict_sample['L_contact'].append(Contact(dict_sample['id_contact'], grain_i, grain_j, dict_material))
                    dict_sample['id_contact'] = dict_sample['id_contact'] + 1
 
             else :
