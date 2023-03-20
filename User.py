@@ -34,8 +34,8 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    N_grain = 80 #total number of grains
-
+    #total number of grains
+    N_grain = 80
     #Disk
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
     L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
@@ -44,13 +44,16 @@ def All_parameters():
     R_mean = 0
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
+    #Grain discretization
+    discretization = 80
 
     #write dict
     dict_geometry = {
     'N_grain' : N_grain,
     'R_mean' : R_mean,
     'L_R' : L_R,
-    'L_percentage_R' : L_percentage_R
+    'L_percentage_R' : L_percentage_R,
+    'discretization' : discretization
     }
 
     #---------------------------------------------------------------------------
@@ -124,7 +127,7 @@ def All_parameters():
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
-    i_print_plot = 100 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    i_print_plot = 500 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
     main_folder_name = 'Data_Shear' #where data are saved
