@@ -38,7 +38,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         Output :
             Nothing, but sample dictionnary is updated
     """
-    i_DEM_0 = dict_sample['i_DEM']
+    i_DEM_0 = dict_algorithm['i_DEM']
     Shear_strain = 0
     #compute the sample height
     min_value = min(dict_sample['L_g'][0].l_border_y)
@@ -63,10 +63,17 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     dict_sample['id_contact'] = 0
     dict_sample['L_g_image'] = []
     dict_sample['L_i_image'] = []
+    #trackers
+    dict_tracker = {
+    'vertical_force_L' : [],
+    'shear_L' : [],
+    'mu_L' : [],
+    'compacity_L' : []
+    }
 
     while DEM_loop_statut :
 
-        dict_sample['i_DEM'] = dict_sample['i_DEM'] + 1
+        dict_algorithm['i_DEM'] = dict_algorithm['i_DEM'] + 1
 
         #create image
         for grain in dict_sample['L_g']:
@@ -110,16 +117,16 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                 image.translation(np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0]))
 
         #Contact detection
-        if (dict_sample['i_DEM']-i_DEM_0-1) % dict_sample['i_update_neighborhoods_com']  == 0:
-            Contact_gg.Update_Neighborhoods(dict_sample)
-            Contact_gimage.Update_Neighborhoods(dict_sample)
+        if (dict_algorithm['i_DEM']-i_DEM_0-1) % dict_algorithm['i_update_neighborhoods']  == 0:
+            Contact_gg.Update_Neighborhoods(dict_algorithm, dict_sample)
+            Contact_gimage.Update_Neighborhoods(dict_algorithm, dict_sample)
         Contact_gg.Grains_contact_Neighborhoods(dict_sample,dict_material)
         Contact_gimage.Grains_contact_Neighborhoods(dict_sample,dict_material)
 
         #Sollicitation computation
         for grain in dict_sample['L_g']:
              grain.init_F_control(dict_sollicitation['gravity'])
-        for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']+dict_sample['L_contact_gw']:
+        for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']:
             contact.normal()
             contact.tangential(dict_algorithm['dt_DEM'])
 
@@ -144,7 +151,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         #Move grains (only Current)
         for grain in dict_sample['L_g']:
             if grain.group == 'Current' :
-                grain.euler_semi_implicite(dict_algorithm['dt_DEM'],0.005)
+                grain.euler_semi_implicite(dict_algorithm['dt_DEM'])
 
         #periodic condition
         for grain in dict_sample['L_g']:
@@ -172,16 +179,27 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         #Control the top group to have the pressure target
         dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g'])
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
+        #shear the top group
         for grain in dict_sample['L_g'] :
             if grain.group == 'Top':
                 grain.move_as_a_group(np.array([dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'], dy_top]), dict_algorithm['dt_DEM'])
         #Update shear strain
         Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'] / Sample_height
 
-        if dict_sample['i_DEM'] % dict_sample['i_print_plot'] == 0:
-            print('i_DEM',dict_sample['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
-            if dict_sample['Debug_DEM'] :
-                Owntools.Plot_Config_Loaded(dict_sample,dict_sample['i_DEM'])
+        #comoute compacity
+        Surface_g = 0
+        for grain in dict_sample['L_g']:
+            Surface_g = Surface_g + grain.surface
+
+        #tracker
+        dict_tracker['vertical_force_L'].append(Fv)
+        dict_tracker['shear_L'].append(Shear_strain)
+        dict_tracker['compacity_L'].append(Surface_g/((dict_sample['y_box_max']-dict_sample['y_box_min'])*(dict_sample['x_box_max']-dict_sample['x_box_min'])))
+
+        if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
+            print('i_DEM',dict_algorithm['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
+            if dict_algorithm['Debug_DEM'] :
+                Owntools.Plot_Config_Loaded(dict_sample,dict_algorithm['i_DEM'])
 
         #Check stop conditions for DEM
         if Shear_strain >= dict_sollicitation['Shear_strain_target'] :
@@ -190,7 +208,9 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             DEM_loop_statut = False
 
     #plot total displacement field
-    Owntools.Plot_total_U(dict_sample)
+    Owntools.Plot.Plot_total_U(dict_sample)
+    #plot trackers
+    Owntools.Plot.Plot_strain_compacity(dict_tracker)
 
 #-------------------------------------------------------------------------------
 
