@@ -10,6 +10,9 @@ This file contains the different functions used in the simulation.
 #Librairies
 #-------------------------------------------------------------------------------
 
+import matplotlib.pyplot as plt
+
+#Own
 import Grain
 import Contact_gg
 import Contact_gimage
@@ -99,3 +102,19 @@ def Plot_total_U(dict_sample):
     plt.close(1)
 
 #-------------------------------------------------------------------------------
+
+def Plot_strain_compacity(dict_tracker):
+    """
+    Plot the curve strain - compacity.
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1, figsize = (16,9))
+    plt.plot(dict_tracker['shear_L'], dict_tracker['compacity_L'])
+    plt.xlabel('Shear strain (-)')
+    plt.ylabel('Compacity (-)')
+    plt.savefig('Debug/strain_compacity.png')
+    plt.close(1)
