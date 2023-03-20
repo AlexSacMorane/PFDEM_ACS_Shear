@@ -24,53 +24,34 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def __init__(self, grain_sphere, n_border):
+  def __init__(self, grain_tempo):
     """Defining the grain.
 
         Input :
             a grain tempo (a tempo grain)
-            a discretization of the grain (an int)
         Output :
-            a grain tempo polygonal (a tempo polygonal grain)
+            a real grain (a grain)
     """
-    L_border = []
-    L_border_x = []
-    L_border_y = []
-    L_r = []
-    L_theta_r = []
-    #Build the border (for print)
-    for i in range(n_border):
-        theta = 2*math.pi*i/n_border
-        p = np.array(grain_sphere.center) + np.array([grain_sphere.radius*math.cos(theta),grain_sphere.radius*math.sin(theta)])
-        L_border.append(p)
-        L_border_x.append(p[0])
-        L_border_y.append(p[1])
-        L_r.append(grain_sphere.radius)
-        L_theta_r.append(theta)
-    L_border.append(L_border[0])
-    L_border_x.append(L_border_x[0])
-    L_border_y.append(L_border_y[0])
-    #save
-    self.group = 'Current'
+    self.group = grain_tempo.group
     self.image = None
-    self.radius = grain_sphere.radius
-    self.r_min = grain_sphere.radius
-    self.r_max = grain_sphere.radius
-    self.theta = 0
-    self.rho_surf = grain_sphere.rho_surf
-    self.surface = math.pi*grain_sphere.radius**2
-    self.mass = math.pi*grain_sphere.radius**2*grain_sphere.rho_surf
-    self.inertia = self.mass*grain_sphere.radius**2
-    self.id = grain_sphere.id
-    self.center = np.array(grain_sphere.center)
-    self.l_border = L_border
-    self.l_border_x = L_border_x
-    self.l_border_y = L_border_y
-    self.l_r = L_r
-    self.l_theta_r = L_theta_r
-    self.y = grain_sphere.y
-    self.nu = grain_sphere.nu
-    self.g = grain_sphere.g #shear modulus
+    self.radius = grain_tempo.radius
+    self.r_min = grain_tempo.r_min
+    self.r_max = grain_tempo.r_max
+    self.theta = grain_tempo.theta
+    self.rho_surf = grain_tempo.rho_surf
+    self.surface = grain_tempo.surface
+    self.mass = grain_tempo.mass
+    self.inertia = grain_tempo.inertia
+    self.id = grain_tempo.id
+    self.center = grain_tempo.center.copy()
+    self.l_border = grain_tempo.l_border.copy()
+    self.l_border_x = grain_tempo.l_border_x.copy()
+    self.l_border_y = grain_tempo.l_border_y.copy()
+    self.l_r = grain_tempo.l_r.copy()
+    self.l_theta_r = grain_tempo.l_theta_r.copy()
+    self.y = grain_tempo.y
+    self.nu = grain_tempo.nu
+    self.g = grain_tempo.g #shear modulus
     self.fx = 0
     self.fy = 0
     self.v = np.array([0,0])
@@ -84,7 +65,7 @@ class Grain:
       Add a force to the grain.
 
         Input :
-            itself (a grain_tempo)
+            itself (a grain)
             a force applied (a 1 x 2 numpy array)
             a application point (a 1 x 2 numpy array)
         Output :
@@ -105,7 +86,7 @@ class Grain:
       A gravity is assumed.
 
         Input :
-            itself (a grain_tempo)
+            itself (a grain)
             a gravity value (a float)
         Output :
             Nothing, but attributes concerning the force applied are initialized (three floats)
@@ -116,22 +97,19 @@ class Grain:
 
 #-------------------------------------------------------------------------------
 
-  def euler_semi_implicite(self,dt_DEM,factor):
+  def euler_semi_implicite(self,dt_DEM):
     """
     Move the grain following a semi implicit euler scheme.
 
         Input :
-            itself (a grain_tempo)
+            itself (a grain)
             a time step (a float)
-            a factor to limite the displacement (a float)
         Output :
             Nothing, but the grain is moved
     """
     #translation
     a_i = np.array([self.fx,self.fy])/self.mass
     self.v = self.v + a_i*dt_DEM
-    if np.linalg.norm(self.v) > self.radius*factor/dt_DEM: #limitation of the speed
-        self.v = self.v * self.radius*factor/dt_DEM/np.linalg.norm(self.v)
     for i in range(len(self.l_border)):
         self.l_border[i] = self.l_border[i] + self.v*dt_DEM
         self.l_border_x[i] = self.l_border_x[i] + self.v[0]*dt_DEM
@@ -171,7 +149,7 @@ class Grain:
     Move the grain in a group defined.
 
         Input :
-            itself (a grain_tempo)
+            itself (a grain)
             a displacement (a 2 x 1 numpy array)
         Output :
             Nothing, but the grain is moved
@@ -197,7 +175,7 @@ class Grain:
       Check if a grain is in a determined group by comparing center y-coordinate with two limits.
 
         Input :
-            itself (a grain_tempo)
+            itself (a grain)
             two y limits (two floats)
             a name (a string)
         Output :
@@ -220,11 +198,12 @@ class Grain_Image(Grain):
 #-------------------------------------------------------------------------------
 
   def __init__(self, real_grain, position):
-    """Defining the image of a real grain.
+    """
+    Defining the image of a real grain.
 
         Input :
             itself (a grain_image)
-            a real grain (a grain_tempo)
+            a real grain (a grain)
         Output :
             Nothing, but an image grain is generated (a grain_image)
     """
@@ -262,7 +241,7 @@ class Grain_Image(Grain):
 
         Input :
             itself (a grain_image)
-            a real grain (a grain_tempo)
+            a real grain (a grain)
         Output :
             Nothing, but an image grain is generated (a grain_image)
     """
