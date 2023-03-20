@@ -131,3 +131,20 @@ def convert_gg_into_gimage(grain, dict_sample, dict_material):
     for i_contact_to_delete in L_i_contact_to_delete :
         dict_sample['L_contact'].pop(i_contact_to_delete)
         dict_sample['L_contact_ij'].pop(i_contact_to_delete)
+
+#-------------------------------------------------------------------------------
+
+def convert_ic_to_real(dict_ic, dict_sample):
+    """
+    Convert the tempo grain from dict_ic into real grain in dict_sample.
+
+        Input :
+            an initial condition dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            the sample dictionnary gets grains information
+
+    """
+    dict_sample['L_g'] = []
+    for grain_tempo in dict_ic['L_g_tempo'] :
+        dict_sample['L_g'].append(Grain.Grain(grain_tempo))
