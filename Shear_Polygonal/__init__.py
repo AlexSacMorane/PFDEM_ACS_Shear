@@ -156,6 +156,9 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             if grain.group == 'Current' :
                 grain.euler_semi_implicite(dict_algorithm['dt_DEM'])
 
+        #Add solute move algorithm (put some frenquency)
+        #be carefull of the top and bottom group / pericodic condition
+
         #periodic condition
         for grain in dict_sample['L_g']:
             #left wall
@@ -198,7 +201,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
         Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'] / Sample_height #Update shear strain
 
-        #comoute compacity
+        #compute compacity
         Surface_g = 0
         for grain in dict_sample['L_g']:
             Surface_g = Surface_g + grain.surface
@@ -212,7 +215,17 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
             print('i_DEM',dict_algorithm['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
             if dict_algorithm['Debug_DEM'] :
-                Owntools.Plot_Config_Loaded(dict_sample,dict_algorithm['i_DEM'])
+                Owntools.Plot_Config_Loaded(dict_sample,dict_algorithm['i_DEM']) #change function here
+
+        #add move pf dict_algorithm (put some frenquency)
+        #be carefull of the periodic bc
+
+        #add pf simulation (new module) and pf->DEM and DEM->PF
+
+        if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
+            if dict_algorithm['Debug_DEM'] :
+                #add plot
+                pass
 
         #Check stop conditions for DEM
         if Shear_strain >= dict_sollicitation['Shear_strain_target'] :
