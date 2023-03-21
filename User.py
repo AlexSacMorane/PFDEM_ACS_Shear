@@ -102,7 +102,7 @@ def All_parameters():
 
     #Phase field
     dt_PF = 0.01 #s time step during MOOSE simulation
-    n_t_PF = 10 #number of iterations PF-DEM
+    n_t_PF = 10 #number of iterations PF
     factor_distribution_etai = 1.5 #margin to distribute etai
     n_local = 40 #number of node inside local PF simulation
     dx_local = 2*min(dict_geometry['L_R'])/(n_local-1)
@@ -119,7 +119,7 @@ def All_parameters():
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 50 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
-    d_to_image = 2 * max(L_R)
+    d_to_image = 2 * max(L_R) #distance to wall to generate images
 
     #Number of processor
     np_proc = 4
@@ -160,17 +160,24 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Initial condition parameters
 
+    #grains generation
     n_generation = 1 #number of grains generation
     factor_ymax_box = 1.5 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
-    i_DEM_stop_IC = 4000 #stop criteria for DEM during IC
-    Debug_DEM_IC = False #plot configuration inside DEM during IC
-    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+
+    #current dem step
     dt_DEM_IC = dt_DEM_crit/6 #s time step during IC
-    Ecin_ratio_IC = 0.0005
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods_gen = 20 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
     i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
+
+    #steady-state detection
+    i_DEM_stop_IC = 4000 #stop criteria for DEM during IC
+    Ecin_ratio_IC = 0.0005 #to detect steady-state
+
+    #debugging
+    Debug_DEM_IC = False #plot configuration inside DEM during IC
+    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
 
     #write dict
     dict_ic = {
