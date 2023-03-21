@@ -177,7 +177,7 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, d
     """
     Owntools.convert_ic_to_real(dict_ic, dict_sample)
     #save
-    Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
 #-------------------------------------------------------------------------------
 

@@ -45,6 +45,7 @@ dict_save = pickle.load(toload)
 toload.close()
 dict_algorithm = dict_save['algorithm']
 dict_geometry = dict_save['geometry']
+dict_ic = dict_save['ic']
 dict_material = dict_save['material']
 dict_sample = dict_save['sample']
 dict_sollicitations = dict_save['sollicitations']

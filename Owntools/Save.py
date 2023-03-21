@@ -22,13 +22,14 @@ import Report
 #functions
 #-------------------------------------------------------------------------------
 
-def save_dicts_ic(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report):
+def save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
     """
     Save dictionnaries after the initial configuration.
 
         Input :
             an algorithm dictionnary (a dict)
             a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
@@ -40,6 +41,7 @@ def save_dicts_ic(dict_algorithm, dict_geometry, dict_material, dict_sample, dic
     dict_save = {}
     dict_save['algorithm'] = dict_algorithm
     dict_save['geometry'] = dict_geometry
+    dict_save['ic'] = dict_ic
     dict_save['material'] = dict_material
     dict_save['sample'] = dict_sample
     dict_save['sollicitations'] = dict_sollicitations
@@ -47,16 +49,16 @@ def save_dicts_ic(dict_algorithm, dict_geometry, dict_material, dict_sample, dic
     pickle.dump(dict_save,outfile)
     outfile.close()
 
-
 #-------------------------------------------------------------------------------
 
-def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+def save_dicts(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     """
     Save dictionnaries at the end of PFDEM iteration.
 
         Input :
             an algorithm dictionnary (a dict)
             a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
@@ -68,6 +70,7 @@ def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_s
     dict_save = {}
     dict_save['algorithm'] = dict_algorithm
     dict_save['geometry'] = dict_geometry
+    dict_save['ic'] = dict_ic
     dict_save['material'] = dict_material
     dict_save['sample'] = dict_sample
     dict_save['sollicitations'] = dict_sollicitations
@@ -78,13 +81,14 @@ def save_dicts(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_s
 
 #-------------------------------------------------------------------------------
 
-def save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+def save_dicts_before_pf(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     """
     Save dictionnaries at the end of PFDEM iteration.
 
         Input :
             an algorithm dictionnary (a dict)
             a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
@@ -96,6 +100,7 @@ def save_dicts_before_pf(dict_algorithm, dict_geometry, dict_material, dict_samp
     dict_save = {}
     dict_save['algorithm'] = dict_algorithm
     dict_save['geometry'] = dict_geometry
+    dict_save['ic'] = dict_ic
     dict_save['material'] = dict_material
     dict_save['sample'] = dict_sample
     dict_save['sollicitations'] = dict_sollicitations
