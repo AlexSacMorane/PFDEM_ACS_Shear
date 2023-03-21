@@ -231,5 +231,6 @@ if '__main__' == __name__:
     generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     define_group(dict_geometry, dict_ic, dict_sample, simulation_report)
     from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    #need to add step with PID load
     shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
     close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
