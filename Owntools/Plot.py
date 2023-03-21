@@ -118,3 +118,21 @@ def Plot_strain_compacity(dict_tracker):
     plt.ylabel('Compacity (-)')
     plt.savefig('Debug/strain_compacity.png')
     plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_strain_confinement(dict_tracker):
+    """
+    Plot the curve strain - vertical force (confinement).
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1, figsize = (16,9))
+    plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_L'])
+    plt.xlabel('Shear strain (-)')
+    plt.ylabel('Vertical force (confinement)  (µN)')
+    plt.savefig('Debug/strain_confinement.png')
+    plt.close(1)
