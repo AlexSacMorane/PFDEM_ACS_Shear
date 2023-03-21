@@ -208,7 +208,8 @@ class Contact_Image:
         F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
-        self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][ij_min[0]])
+        if self.g1.group == 'Current' : #no damping for top and bottom
+            self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][ij_min[0]])
         #no force on G2 because it is an image
 
     #no contact finally
@@ -263,7 +264,8 @@ class Contact_Image:
         F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
         F_2_1_damp = F_2_1_damp_t *self.pc_tangential
         self.ft_damp = F_2_1_damp_t
-        self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][self.ij_min[0]])
+        if self.g1.group == 'Current' : #no damping for top and bottom
+            self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][self.ij_min[0]])
         #no force on G2 because it is an image
 
     #no contact finally
