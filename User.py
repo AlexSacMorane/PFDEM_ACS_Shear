@@ -128,7 +128,7 @@ def All_parameters():
 
     #PID corrector to apply confinement force on Top group
     PID_kp = 0.01
-    dy_top_max = 0
+    dy_top_max = factor_neighborhood*R_mean*0.75 #limit the speed of the top group
 
     #Number of processor
     np_proc = 4
