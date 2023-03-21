@@ -129,7 +129,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
              grain.init_F_control(dict_sollicitation['gravity'])
         for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']:
             #do not consider the contact inside top and bottom groups
-            if not (contact.g1.group == 'Top' and contact.g2.group =='Top') or (contact.g1.group == 'Bottom' and contact.g2.group =='Bottom') :
+            if not (contact.g1.group == 'Top' and contact.g2.group =='Top') or not (contact.g1.group == 'Bottom' and contact.g2.group =='Bottom') :
                 contact.normal()
                 contact.tangential(dict_algorithm['dt_DEM'])
 
