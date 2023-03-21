@@ -131,6 +131,7 @@ def Plot_strain_confinement(dict_tracker, dict_sollicitations):
             Nothing, but a .png file is generated (a file)
     """
     plt.figure(1, figsize = (16,9))
+    
     plt.subplot(121)
     plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_L'])
     plt.plot([dict_tracker['shear_L'][0], dict_tracker['shear_L'][-1]], [dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']])
