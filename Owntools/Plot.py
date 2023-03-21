@@ -133,6 +133,24 @@ def Plot_strain_confinement(dict_tracker):
     plt.figure(1, figsize = (16,9))
     plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_L'])
     plt.xlabel('Shear strain (-)')
-    plt.ylabel('Vertical force (confinement)  (µN)')
+    plt.ylabel('Vertical force (confinement) (µN)')
     plt.savefig('Debug/strain_confinement.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_strain_mu_sample(dict_tracker):
+    """
+    Plot the curve strain - sample friction.
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1, figsize = (16,9))
+    plt.plot(dict_tracker['shear_L'], dict_tracker['mu_sample_L'])
+    plt.xlabel('Shear strain (-)')
+    plt.ylabel('Sample friction (-)')
+    plt.savefig('Debug/strain_sample_friction.png')
     plt.close(1)

@@ -68,7 +68,8 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     'vertical_force_L' : [],
     'shear_L' : [],
     'mu_L' : [],
-    'compacity_L' : []
+    'compacity_L' : [],
+    'mu_sample_L' : []
     }
 
     while DEM_loop_statut :
@@ -127,8 +128,10 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         for grain in dict_sample['L_g']:
              grain.init_F_control(dict_sollicitation['gravity'])
         for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']:
-            contact.normal()
-            contact.tangential(dict_algorithm['dt_DEM'])
+            #do not consider the contact inside top and bottom groups
+            if not (contact.g1.group == 'Top' and contact.g2.group =='Top') or (contact.g1.group == 'Bottom' and contact.g2.group =='Bottom') :
+                contact.normal()
+                contact.tangential(dict_algorithm['dt_DEM'])
 
         #Delete contacts gg and gimage with no overlap
         L_i_toremove = []
@@ -176,6 +179,19 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                 #contact gg needed to be convert into gimage
                 Owntools.convert_gg_into_gimage(grain, dict_sample, dict_material)
 
+        #Compute the sample friction coefficient
+        sum_fx_top = 0
+        sum_fy_top = 0
+        for grain in dict_sample['L_g']:
+            if grain.group == 'Top':
+                sum_fx_top = sum_fx_top + grain.fx
+                sum_fy_top = sum_fy_top + grain.fy
+        mu_sample = sum_fy_top / sum_fx_top
+        dict_tracker['mu_sample_L'].append(mu_sample)
+
+
+        #put the servo control here ! (Watch the maximum speed)
+
         #Control the top group to have the pressure target
         dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g'])
         dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
@@ -212,6 +228,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     #plot trackers
     Owntools.Plot.Plot_strain_compacity(dict_tracker)
     Owntools.Plot.Plot_strain_confinement(dict_tracker)
+    Owntools.Plot.Plot_strain_mu_sample(dict_tracker)
 
 #-------------------------------------------------------------------------------
 
