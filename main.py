@@ -187,8 +187,6 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
 
         Input :
             an algorithm dictionnary (a dict)
-            a geometry dictionnary (a dict)
-            an initial condition dictionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
@@ -206,6 +204,25 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
     simulation_report.tac_tempo(datetime.now(), 'Shearing')
 
 #-------------------------------------------------------------------------------
+
+def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
+    '''
+    Close the simulation.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a simulation report (a report)
+        Output :
+            Nothing, but dictionnaries are updated
+    '''
+    pass
+
+#-------------------------------------------------------------------------------
 #main
 #-------------------------------------------------------------------------------
 
@@ -215,3 +232,4 @@ if '__main__' == __name__:
     define_group(dict_geometry, dict_ic, dict_sample, simulation_report)
     from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
     shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
