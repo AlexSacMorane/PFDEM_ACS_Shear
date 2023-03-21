@@ -34,7 +34,7 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Geometric parameters
 
-    #total number of grains
+    #Total number of grains
     N_grain = 80
     #Disk
     R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
@@ -47,12 +47,12 @@ def All_parameters():
     #Grain discretization
     discretization = 80
 
-    #write dict
+    #Write dict
     dict_geometry = {
     'N_grain' : N_grain,
-    'R_mean' : R_mean,
     'L_R' : L_R,
     'L_percentage_R' : L_percentage_R,
+    'R_mean' : R_mean,
     'discretization' : discretization
     }
 
@@ -67,11 +67,11 @@ def All_parameters():
     mu_friction = 0.5 #grain-grain
     coeff_restitution = 0.2 #1 is perfect elastic
 
-    # PF parameters
+    #PF parameters
     M_pf = 1 # mobility
     kc_pf = 3 #gradient coefficient
 
-    #write dict
+    #Write dict
     dict_material = {
     'Y' : Y,
     'nu' : nu,
@@ -92,7 +92,7 @@ def All_parameters():
     x_box_max = 2*R_mean*math.sqrt(N_grain/H_D_ratio) #µm
     y_box_min = 0 #µm
 
-    #write dict
+    #Write dict
     dict_sample = {
     'x_box_min' : x_box_min,
     'x_box_max' : x_box_max,
@@ -109,7 +109,8 @@ def All_parameters():
     n_local = 40 #number of node inside local PF simulation
     dx_local = 2*min(dict_geometry['L_R'])/(n_local-1)
     dy_local = 2*min(dict_geometry['L_R'])/(n_local-1)
-    #add into material dict from this data
+
+    #From those date, add variables into material dict
     w = 4*math.sqrt(dx_local**2+dy_local**2)
     double_well_height = 10*dict_material['kc_pf']/w/w
     dict_material['w'] = w
@@ -121,7 +122,13 @@ def All_parameters():
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 50 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
+
+    #Periodic conditions
     d_to_image = 2 * max(L_R) #distance to wall to generate images
+
+    #PID corrector to apply confinement force on Top group
+    PID_kp = 0.01
+    dy_top_max = 0
 
     #Number of processor
     np_proc = 4
@@ -135,28 +142,30 @@ def All_parameters():
     main_folder_name = 'Data_Shear' #where data are saved
     template_simulation_name = 'Run_' #template of the simulation name
 
-    #write dict
+    #Write dict
     dict_algorithm = {
     'dt_PF' : dt_PF,
     'n_t_PF' : n_t_PF,
-    'dt_DEM_crit' : dt_DEM_crit,
+    'factor_distribution_etai' : factor_distribution_etai,
     'n_local' : n_local,
     'dx_local' : dx_local,
     'dy_local' : dy_local,
+    'dt_DEM_crit' : dt_DEM_crit,
     'dt_DEM' : dt_DEM,
+    'factor_neighborhood' : factor_neighborhood,
     'i_update_neighborhoods': i_update_neighborhoods,
-    'd_to_image' : d_to_image,
     'Spring_type' : Spring_type,
+    'd_to_image' : d_to_image,
+    'kp' : PID_kp,
+    'dy_top_max' : dy_top_max,
     'np_proc' : np_proc,
     'Debug' : Debug,
     'Debug_DEM' : Debug_DEM,
+    'i_print_plot' : i_print_plot,
+    'clean_memory' : clean_memory,
     'SaveData' : SaveData,
     'main_folder_name' : main_folder_name,
-    'template_simulation_name' : template_simulation_name,
-    'i_print_plot' : i_print_plot,
-    'factor_neighborhood' : factor_neighborhood,
-    'factor_distribution_etai' : factor_distribution_etai,
-    'clean_memory' : clean_memory
+    'template_simulation_name' : template_simulation_name
     }
 
     #---------------------------------------------------------------------------
@@ -184,16 +193,16 @@ def All_parameters():
     #write dict
     dict_ic = {
     'n_generation' : n_generation,
+    'factor_ymax_box' : factor_ymax_box,
+    'N_test_max' : N_test_max,
+    'dt_DEM_IC' : dt_DEM_IC,
+    'factor_neighborhood_IC' : factor_neighborhood_IC,
     'i_update_neighborhoods_gen': i_update_neighborhoods_gen,
     'i_update_neighborhoods_com': i_update_neighborhoods_com,
-    'factor_ymax_box' : factor_ymax_box,
     'i_DEM_stop_IC' : i_DEM_stop_IC,
-    'Debug_DEM' : Debug_DEM_IC,
-    'dt_DEM_IC' : dt_DEM_IC,
     'Ecin_ratio_IC' : Ecin_ratio_IC,
-    'i_print_plot_IC' : i_print_plot_IC,
-    'factor_neighborhood_IC' : factor_neighborhood_IC,
-    'N_test_max' : N_test_max
+    'Debug_DEM' : Debug_DEM_IC,
+    'i_print_plot_IC' : i_print_plot_IC
     }
 
     #---------------------------------------------------------------------------
@@ -213,8 +222,8 @@ def All_parameters():
 
     #write dict
     dict_sollicitations = {
-    'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'gravity' : gravity,
+    'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'Shear_velocity' : Shear_velocity,
     'Shear_strain_target' : Shear_strain_target
     }
