@@ -189,7 +189,8 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             if grain.group == 'Top':
                 sum_fx_top = sum_fx_top + grain.fx
                 sum_fy_top = sum_fy_top + grain.fy
-        mu_sample = abs(sum_fx_top / sum_fy_top)
+        if sum_fy_top != 0 : #else keep same value
+            mu_sample = abs(sum_fx_top / sum_fy_top)
 
         #Control the top group to have the pressure target
         dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitation['Vertical_Confinement_Force'], dict_sample['L_g'])
