@@ -187,20 +187,16 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                 sum_fx_top = sum_fx_top + grain.fx
                 sum_fy_top = sum_fy_top + grain.fy
         mu_sample = sum_fx_top / sum_fy_top
-        dict_tracker['mu_sample_L'].append(mu_sample)
-
-
-        #put the servo control here ! (Watch the maximum speed)
 
         #Control the top group to have the pressure target
-        dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g'])
-        dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
-        #shear the top group
+        dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitation['Vertical_Confinement_Force'], dict_sample['L_g'])
+        #dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g'])
+        #Shear the top group and apply confinement force
         for grain in dict_sample['L_g'] :
             if grain.group == 'Top':
                 grain.move_as_a_group(np.array([dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'], dy_top]), dict_algorithm['dt_DEM'])
-        #Update shear strain
-        Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'] / Sample_height
+        dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
+        Shear_strain = Shear_strain + dict_sollicitation['Shear_velocity']*dict_algorithm['dt_DEM'] / Sample_height #Update shear strain
 
         #comoute compacity
         Surface_g = 0
@@ -208,9 +204,10 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             Surface_g = Surface_g + grain.surface
 
         #tracker
-        dict_tracker['vertical_force_L'].append(Fv)
         dict_tracker['shear_L'].append(Shear_strain)
         dict_tracker['compacity_L'].append(Surface_g/((dict_sample['y_box_max']-dict_sample['y_box_min'])*(dict_sample['x_box_max']-dict_sample['x_box_min'])))
+        dict_tracker['vertical_force_L'].append(Fv)
+        dict_tracker['mu_sample_L'].append(mu_sample)
 
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
             print('i_DEM',dict_algorithm['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
