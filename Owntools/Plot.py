@@ -121,7 +121,7 @@ def Plot_strain_compacity(dict_tracker):
 
 #-------------------------------------------------------------------------------
 
-def Plot_strain_confinement(dict_tracker):
+def Plot_strain_confinement(dict_tracker, dict_sollicitations):
     """
     Plot the curve strain - vertical force (confinement).
 
@@ -131,9 +131,22 @@ def Plot_strain_confinement(dict_tracker):
             Nothing, but a .png file is generated (a file)
     """
     plt.figure(1, figsize = (16,9))
+    plt.subplot(121)
     plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_L'])
+    plt.plot([dict_tracker['shear_L'][0], dict_tracker['shear_L'][-1]], [dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']])
     plt.xlabel('Shear strain (-)')
-    plt.ylabel('Vertical force (confinement) (µN)')
+    plt.ylabel('Vertical confinement force (µN)')
+
+    #focus
+    perc_confinement_L = []
+    for force in dict_tracker['vertical_force_L'] :
+        perc_confinement_L.append(force/dict_sollicitations['Vertical_Confinement_Force']*100)
+    plt.subplot(122)
+    plt.plot(dict_tracker['shear_L'], perc_confinement_L)
+    plt.ylim((95,105))
+    plt.xlabel('Shear strain (-)')
+    plt.ylabel('Vertical confinement force (% of the target value)')
+
     plt.savefig('Debug/strain_confinement.png')
     plt.close(1)
 
