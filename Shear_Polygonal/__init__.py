@@ -260,6 +260,8 @@ def Control_Top_PID(dict_algorithm, Force_target, L_g):
     return dy_top, F
 
 #-------------------------------------------------------------------------------
+#Not used
+#-------------------------------------------------------------------------------
 
 def Control_Top_NR(Force_target,L_contact_gg,L_g):
     """
