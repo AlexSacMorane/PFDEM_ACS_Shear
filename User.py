@@ -59,12 +59,14 @@ def All_parameters():
     #---------------------------------------------------------------------------
     #Material parameters
 
+    #DEM parameters
     Y = 70*(10**9)*(10**6)*(10**(-12)) #Young Modulus µN/µm2
     nu = 0.3 #Poisson's ratio
     rho = 2500*10**(-6*3) #density kg/µm3
     rho_surf_disk = 4/3*rho*R_mean #kg/µm2
     mu_friction = 0.5 #grain-grain
     coeff_restitution = 0.2 #1 is perfect elastic
+
     # PF parameters
     M_pf = 1 # mobility
     kc_pf = 3 #gradient coefficient
