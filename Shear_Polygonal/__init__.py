@@ -186,7 +186,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             if grain.group == 'Top':
                 sum_fx_top = sum_fx_top + grain.fx
                 sum_fy_top = sum_fy_top + grain.fy
-        mu_sample = sum_fy_top / sum_fx_top
+        mu_sample = sum_fx_top / sum_fy_top
         dict_tracker['mu_sample_L'].append(mu_sample)
 
 
@@ -232,6 +232,38 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
 
 #-------------------------------------------------------------------------------
 
+def Control_Top_PID(dict_algorithm, Force_target, L_g):
+    """
+    Control the upper wall to apply force.
+
+    A PID corrector is applied.
+        Input :
+            an algorithm dictionnary (a dict)
+            a confinement value (a float)
+            a list of grain (a list)
+        Output :
+            the displacement of the top group (a float)
+            a force applied on the top group before control (a float)
+    """
+    #compute vertical force applied on top group
+    F = 0
+    for grain in L_g :
+        if grain.group == 'Top':
+            F = F + grain.fy
+    #compare with the target value
+    error = F - Force_target #to have dy_top < 0 is F < Force_target
+    #corrector
+    ki = 0
+    kd = 0
+    dy_top = error * dict_algorithm['kp']
+    #compare with maximum value
+    if abs(dy_top) > dict_algorithm['dy_top_max'] :
+        dy_top = np.sign(dy_top)*dict_algorithm['dy_top_max']
+
+    return dy_top, F
+
+#-------------------------------------------------------------------------------
+
 def Control_Top_NR(Force_target,L_contact_gg,L_g):
     """
     Control the upper wall to apply force.
@@ -240,7 +272,7 @@ def Control_Top_NR(Force_target,L_contact_gg,L_g):
         Input :
             a confinement value (a float)
             a list of contact grain - grain and grain - image (a list)
-            a list of temporary grain (a list)
+            a list of grain (a list)
         Output :
             the displacement of the top group (a float)
             a force applied on the top group before control (a float)
