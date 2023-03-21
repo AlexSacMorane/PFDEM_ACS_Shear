@@ -136,7 +136,7 @@ def All_parameters():
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = False #plot configuration inside DEM
-    i_print_plot = 500 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
     main_folder_name = 'Data_Shear' #where data are saved
@@ -188,7 +188,7 @@ def All_parameters():
 
     #debugging
     Debug_DEM_IC = False #plot configuration inside DEM during IC
-    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+    i_print_plot_IC = 300 #frenquency of the print and plot (if Debug_DEM_IC) for IC
 
     #write dict
     dict_ic = {
