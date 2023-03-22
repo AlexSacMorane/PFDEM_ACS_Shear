@@ -227,10 +227,20 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
 #-------------------------------------------------------------------------------
 
 if '__main__' == __name__:
+
+    #get data
     dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report = plan_simulation()
+
+    #ic generation
     generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     define_group(dict_geometry, dict_ic, dict_sample, simulation_report)
-    from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
     #need to add step with PID load
+
+    #convert ic to real grain
+    from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
+
+    #load
     shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
+
+    #cose simulation
     close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
