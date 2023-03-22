@@ -58,8 +58,6 @@ def plan_simulation():
         shutil.rmtree('Debug')
     os.mkdir('Debug')
     if dict_algorithm['Debug'] or dict_algorithm['Debug_DEM'] or dict_ic['Debug_DEM_IC'] :
-        if dict_algorithm['Debug'] :
-            os.mkdir('Debug/Configuration')
         if dict_algorithm['Debug_DEM'] :
             os.mkdir('Debug/Shear')
         if dict_ic['Debug_DEM'] :
@@ -111,7 +109,7 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
     Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
 
-    simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample')
+    simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample\n')
     #change Parameters
     dict_ic['i_DEM_stop_IC'] = 6000
     dict_ic['i_print_plot_IC'] = 100
@@ -122,6 +120,7 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
     simulation_report.tac_tempo(datetime.now(), 'From disks to polygons')
 
     #load discrete grains
+    print('Load with top plate')
     simulation_report.tic_tempo(datetime.now())
     Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with polygons')
@@ -149,6 +148,7 @@ def define_group(dict_geometry, dict_ic, dict_sample, simulation_report):
             i_bottom = i_bottom + 1
         elif grain.is_group(dict_sample['y_box_max']-2*dict_geometry['R_mean'], dict_sample['y_box_max'], 'Top') :
             i_top = i_top + 1
+    simulation_report.write_and_print('\nDefine groups\n','\nDefine groups')
     simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n')
 
     #delete contact gw
@@ -158,27 +158,6 @@ def define_group(dict_geometry, dict_ic, dict_sample, simulation_report):
     #plot group distribution
     Owntools.Plot.Plot_group_distribution(dict_ic)
     simulation_report.tac_tempo(datetime.now(), 'Define groups')
-
-#-------------------------------------------------------------------------------
-
-def from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report):
-    """
-    Convert initial configuration to a current one.
-
-        Input :
-            an algorithm dictionnary (a dict)
-            a geometry dictionnary (a dict)
-            an initial condition dictionnary (a dict)
-            a material dictionnary (a dict)
-            a sample dictionnary (a dict)
-            a sollicitations dictionnary (a dict)
-            a simulation report (a report)
-        Output :
-            Nothing, but dictionnaries are updated
-    """
-    Owntools.convert_ic_to_real(dict_ic, dict_sample)
-    #save
-    Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
 #-------------------------------------------------------------------------------
 
@@ -201,14 +180,39 @@ def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_soll
     #change Parameters
     if not dict_ic['Debug_DEM'] :
         dict_ic['Debug_DEM'] = True
+        if Path('Debug/Init_polygons_group').exists():
+            shutil.rmtree('Debug/Init_polygons_group')
         os.mkdir('Debug/Init_polygons_group')
     dict_ic['i_DEM_stop_IC'] = 6000
-    dict_ic['i_print_plot_IC'] = 50
+    dict_ic['i_print_plot_IC'] = 100
 
     #load discrete grains
+    print('Load with top group')
     simulation_report.tic_tempo(datetime.now())
-    Create_IC_Polygonal.DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report)
+    Create_IC_Polygonal.DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with polygons with groups')
+
+#-------------------------------------------------------------------------------
+
+def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
+    """
+    Convert initial configuration to a current one.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a simulation report (a report)
+        Output :
+            Nothing, but dictionnaries are updated
+    """
+    simulation_report.write_and_print('\nConvert initial configuration to current one\n\n', '\nConvert initial configuration to current one\n')
+    Owntools.convert_ic_to_real(dict_ic, dict_sample)
+    #save
+    Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
 #-------------------------------------------------------------------------------
 
@@ -225,11 +229,8 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
         Output :
             Nothing, but dictionnaries are updated
     '''
-    simulation_report.write_and_print('Shearing the sample\n', 'Shearing the sample')
-    #change Parameters
-    dict_algorithm['i_DEM'] = 0
-
     #shear sample
+    simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo(datetime.now())
     Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Shearing')
@@ -268,7 +269,7 @@ if '__main__' == __name__:
     load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #convert ic to real grain
-    from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #load
     shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
