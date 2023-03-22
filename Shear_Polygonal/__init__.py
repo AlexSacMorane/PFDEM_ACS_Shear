@@ -19,13 +19,15 @@ from Grain import Grain, Grain_Image
 import Contact_gg
 import Contact_gimage
 import Owntools
+import Owntools.Confinement
 import Owntools.Plot
+
 
 #-------------------------------------------------------------------------------
 #Function
 #-------------------------------------------------------------------------------
 
-def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitation, simulation_report):
+def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitation, dict_tracker, simulation_report):
     """
     Loading the granular system with vertical load and shear.
 
@@ -34,6 +36,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitation dictionnary (a dict)
+            a tracker dictionnary (a dict)
             a simultion report (a report)
         Output :
             Nothing, but sample dictionnary is updated
@@ -65,13 +68,11 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     dict_sample['L_g_image'] = []
     dict_sample['L_i_image'] = []
     #trackers
-    dict_tracker = {
-    'vertical_force_L' : [],
-    'shear_L' : [],
-    'mu_L' : [],
-    'compacity_L' : [],
-    'mu_sample_L' : []
-    }
+    dict_tracker['vertical_force_L'] = []
+    dict_tracker['shear_L'] = []
+    dict_tracker['mu_L'] = []
+    dict_tracker['compacity_L'] = []
+    dict_tracker['mu_sample_L'] = []
 
     while DEM_loop_statut :
 
@@ -194,7 +195,8 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             mu_sample = abs(sum_fx_top / sum_fy_top)
 
         #Control the top group to have the pressure target
-        dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitation['Vertical_Confinement_Force'], dict_sample['L_g'])
+        dy_top, Fv = Owntools.Confinement.Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicitation)
+        #dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitation['Vertical_Confinement_Force'], dict_sample['L_g'])
         #Shear the top group and apply confinement force
         for grain in dict_sample['L_g'] :
             if grain.group == 'Top':

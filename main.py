@@ -109,9 +109,8 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
     Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
 
-    simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample\n')
-
     #discretization
+    simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample\n')
     simulation_report.tic_tempo(datetime.now())
     dict_ic = Create_IC_Polygonal.Discretize_Grains(dict_ic, dict_geometry['discretization']) #overwrite sphere dict_ic
     simulation_report.tac_tempo(datetime.now(), 'From disks to polygons')
@@ -204,7 +203,7 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_
 
 #-------------------------------------------------------------------------------
 
-def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report):
+def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     '''
     Shear the sample.
 
@@ -213,6 +212,7 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
             a simulation report (a report)
         Output :
             Nothing, but dictionnaries are updated
@@ -220,7 +220,7 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
     #shear sample
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo(datetime.now())
-    Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Shearing')
 
 #-------------------------------------------------------------------------------
@@ -260,7 +260,8 @@ if '__main__' == __name__:
     from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #load
-    shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    dict_tracker = {}
+    shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
 
     #cose simulation
     close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)

@@ -119,8 +119,8 @@ def All_parameters():
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
-    factor_neighborhood = 3 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 50 #the frequency of the update of the neighborhood of the grains and the walls
+    factor_neighborhood = 1 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods = 1 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
 
     #Groups definition
@@ -135,6 +135,7 @@ def All_parameters():
     dy_top_max = R_mean*0.01 #limit the speed of the top group
     #Apply confinement force (copy algorithm)
     height_to_consider = top_height + 2*R_mean
+    dy_top = R_mean*0.001
 
     #Number of processor
     np_proc = 4
@@ -167,6 +168,7 @@ def All_parameters():
     'kp' : PID_kp,
     'dy_top_max' : dy_top_max,
     'height_to_consider' : height_to_consider,
+    'dy_top' : dy_top,
     'np_proc' : np_proc,
     'Debug' : Debug,
     'Debug_DEM' : Debug_DEM,
@@ -193,7 +195,7 @@ def All_parameters():
 
     #steady-state detection
     i_DEM_stop_IC = 4000 #stop criteria for DEM during IC
-    Ecin_ratio_IC = 0.0005 #to detect steady-state
+    Ecin_ratio_IC = 0.001 #to detect steady-state
 
     #debugging
     Debug_DEM_IC = False #plot configuration inside DEM during IC

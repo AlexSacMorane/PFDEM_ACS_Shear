@@ -56,6 +56,7 @@ class Grain:
     self.fx = 0
     self.fy = 0
     self.v = np.array([0,0])
+    self.mz = 0
     self.w = 0
     self.track_u = False
 

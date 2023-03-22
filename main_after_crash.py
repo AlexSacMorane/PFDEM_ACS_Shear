@@ -62,5 +62,6 @@ simulation_report.write('\nA crash occurs...\n\n')
 #-------------------------------------------------------------------------------
 
 if name_to_load[-14:] =='_ic_save_dicts':
-    main.shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    dict_tracker = {}
+    main.shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
     main.close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
