@@ -45,7 +45,7 @@ def All_parameters():
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Grain discretization
-    discretization = 80
+    discretization = 60
 
     #Write dict
     dict_geometry = {
@@ -119,9 +119,13 @@ def All_parameters():
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
     dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
-    factor_neighborhood = 2 #margin to detect a grain into a neighborhood
+    factor_neighborhood = 3 #margin to detect a grain into a neighborhood
     i_update_neighborhoods = 50 #the frequency of the update of the neighborhood of the grains and the walls
     Spring_type = 'Ponctual' #Kind of contact
+
+    #Groups definition
+    bottom_height = 2*R_mean #bottom group
+    top_height = 2*R_mean #top group
 
     #Periodic conditions
     d_to_image = 2 * max(L_R) #distance to wall to generate images
@@ -129,14 +133,16 @@ def All_parameters():
     #PID corrector to apply confinement force on Top group
     PID_kp = 10**(-8)
     dy_top_max = R_mean*0.01 #limit the speed of the top group
+    #Apply confinement force (copy algorithm)
+    height_to_consider = top_height + 2*R_mean
 
     #Number of processor
     np_proc = 4
 
-    #Debugging
+    #Debug
     Debug = True #plot configuration before and after DEM simulation
     Debug_DEM = True #plot configuration inside DEM
-    i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
+    i_print_plot = 250 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
     main_folder_name = 'Data_Shear' #where data are saved
@@ -155,9 +161,12 @@ def All_parameters():
     'factor_neighborhood' : factor_neighborhood,
     'i_update_neighborhoods': i_update_neighborhoods,
     'Spring_type' : Spring_type,
+    'bottom_height' : bottom_height,
+    'top_height' : top_height,
     'd_to_image' : d_to_image,
     'kp' : PID_kp,
     'dy_top_max' : dy_top_max,
+    'height_to_consider' : height_to_consider,
     'np_proc' : np_proc,
     'Debug' : Debug,
     'Debug_DEM' : Debug_DEM,
@@ -216,9 +225,9 @@ def All_parameters():
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
 
     #Shear
-    U_shear = R_mean / 500
+    U_shear = R_mean / 1000
     Shear_velocity = U_shear/dt_DEM_IC
-    Shear_strain_target = .5 #total shear displacement / initial sample height
+    Shear_strain_target = .25 #total shear displacement / initial sample height
 
     #write dict
     dict_sollicitations = {

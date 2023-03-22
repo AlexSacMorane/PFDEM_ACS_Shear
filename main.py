@@ -110,9 +110,6 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
     simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
 
     simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample\n')
-    #change Parameters
-    dict_ic['i_DEM_stop_IC'] = 6000
-    dict_ic['i_print_plot_IC'] = 100
 
     #discretization
     simulation_report.tic_tempo(datetime.now())
@@ -127,12 +124,12 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
 
 #-------------------------------------------------------------------------------
 
-def define_group(dict_geometry, dict_ic, dict_sample, simulation_report):
+def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
     """
     Define top and bottom groups and walls are deleted.
 
         Input :
-             a geometry dictionnary (a dict)
+             an algorithm dictionnary (a dict)
              an initial dictionnary (a dict)
              a sample dictionnary (a dict)
              a simulation report (a report)
@@ -144,9 +141,9 @@ def define_group(dict_geometry, dict_ic, dict_sample, simulation_report):
     i_bottom = 0
     i_top = 0
     for grain in dict_ic['L_g_tempo'] :
-        if grain.is_group(0, 2*dict_geometry['R_mean'], 'Bottom') :
+        if grain.is_group(dict_sample['y_box_min'], dict_sample['y_box_min'] + dict_algorithm['bottom_height'], 'Bottom') :
             i_bottom = i_bottom + 1
-        elif grain.is_group(dict_sample['y_box_max']-2*dict_geometry['R_mean'], dict_sample['y_box_max'], 'Top') :
+        elif grain.is_group(dict_sample['y_box_max'] - dict_algorithm['top_height'], dict_sample['y_box_max'], 'Top') :
             i_top = i_top + 1
     simulation_report.write_and_print('\nDefine groups\n','\nDefine groups')
     simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n')
@@ -256,7 +253,7 @@ if '__main__' == __name__:
 
     #ic generation
     generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
-    define_group(dict_geometry, dict_ic, dict_sample, simulation_report)
+    define_group(dict_algorithm, dict_ic, dict_sample, simulation_report)
     load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #convert ic to real grain
