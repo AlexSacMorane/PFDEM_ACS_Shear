@@ -38,6 +38,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         Output :
             Nothing, but sample dictionnary is updated
     """
+    dict_algorithm['i_DEM'] = 0
     i_DEM_0 = dict_algorithm['i_DEM']
     Shear_strain = 0
     #compute the sample height
@@ -194,7 +195,6 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
 
         #Control the top group to have the pressure target
         dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitation['Vertical_Confinement_Force'], dict_sample['L_g'])
-        #dy_top, Fv = Control_Top_NR(dict_sollicitation['Vertical_Confinement_Force'],dict_sample['L_contact']+dict_sample['L_contact_gimage'],dict_sample['L_g'])
         #Shear the top group and apply confinement force
         for grain in dict_sample['L_g'] :
             if grain.group == 'Top':
@@ -216,7 +216,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
             print('i_DEM',dict_algorithm['i_DEM'],'and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'% and Shear',int(100*Shear_strain/dict_sollicitation['Shear_strain_target']),'%')
             if dict_algorithm['Debug_DEM'] :
-                Owntools.Plot_Config_Loaded(dict_sample,dict_algorithm['i_DEM']) #change function here
+                Owntools.Plot.Plot_Config_Loaded(dict_sample,dict_algorithm['i_DEM']) #change function here
 
         #add move pf dict_algorithm (put some frenquency)
         #be carefull of the periodic bc
