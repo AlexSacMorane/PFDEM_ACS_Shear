@@ -25,7 +25,8 @@ class Grain:
 #-------------------------------------------------------------------------------
 
   def __init__(self, grain_tempo):
-    """Defining the grain.
+    """
+    Defining the grain.
 
         Input :
             a grain tempo (a tempo grain)
