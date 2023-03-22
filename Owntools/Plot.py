@@ -38,7 +38,7 @@ def Plot_group_distribution(dict_ic):
             if grain.group == L_group[i_group] :
                 plt.plot(grain.l_border_x, grain.l_border_y, L_color_group[i_group])
     plt.axis("equal")
-    fig.savefig('Debug/Configuration/Group_Distribution.png')
+    fig.savefig('Debug/Group_Distribution.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ def Plot_Config_Loaded(dict_sample,i):
             if grain.group == L_group[i_group]:
                 plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
     plt.axis('equal')
-    plt.savefig('Debug/Configuration/Shear/Config_Loaded_'+str(i)+'.png')
+    plt.savefig('Debug/Shear/Config_Loaded_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ def Plot_total_U(dict_sample):
             v_L.append(grain.total_uy)
     plt.quiver(x_L,y_L,u_L,v_L)
     plt.axis('equal')
-    plt.savefig('Debug/Configuration/Total_U_Sheared.png')
+    plt.savefig('Debug/Total_U_Sheared.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ def Plot_strain_confinement(dict_tracker, dict_sollicitations):
             Nothing, but a .png file is generated (a file)
     """
     plt.figure(1, figsize = (16,9))
-    
+
     plt.subplot(121)
     plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_L'])
     plt.plot([dict_tracker['shear_L'][0], dict_tracker['shear_L'][-1]], [dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']])
