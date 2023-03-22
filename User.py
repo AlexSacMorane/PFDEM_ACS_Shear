@@ -127,15 +127,15 @@ def All_parameters():
     d_to_image = 2 * max(L_R) #distance to wall to generate images
 
     #PID corrector to apply confinement force on Top group
-    PID_kp = 0.01
-    dy_top_max = factor_neighborhood*R_mean*0.75 #limit the speed of the top group
+    PID_kp = 10**(-8)
+    dy_top_max = R_mean*0.01 #limit the speed of the top group
 
     #Number of processor
     np_proc = 4
 
     #Debugging
     Debug = True #plot configuration before and after DEM simulation
-    Debug_DEM = False #plot configuration inside DEM
+    Debug_DEM = True #plot configuration inside DEM
     i_print_plot = 200 #frenquency of the print and plot (if Debug_DEM) in DEM step
     clean_memory = True #delete Data, Input, Output at the end of the simulation
     SaveData = True #save simulation
@@ -216,9 +216,9 @@ def All_parameters():
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
 
     #Shear
-    U_shear = R_mean / 100
+    U_shear = R_mean / 500
     Shear_velocity = U_shear/dt_DEM_IC
-    Shear_strain_target = 1.5 #total shear displacement / initial sample height
+    Shear_strain_target = .5 #total shear displacement / initial sample height
 
     #write dict
     dict_sollicitations = {
