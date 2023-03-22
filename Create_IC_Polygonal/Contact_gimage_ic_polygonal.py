@@ -199,6 +199,7 @@ class Contact_Image_Tempo_Polygonal:
         self.F_2_1_n = F_2_1_n
         self.Ep_n = 2/5 * k * overlap**(5/2) #-dEp/dx = F_2_1_n
         self.g1.add_F( F_2_1, self.g1.l_border[:-1][ij_min[0]])
+        #no force on G2 because it is an image
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -207,7 +208,9 @@ class Contact_Image_Tempo_Polygonal:
         F_2_1_damp_n = np.dot(self.g2.v - self.g1.v,PC_normal)*eta
         F_2_1_damp = F_2_1_damp_n *PC_normal
         self.F_2_1_damp = F_2_1_damp_n
-        self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][ij_min[0]])
+        if self.g1.group == 'Current' : #no damping for top and bottom
+            self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][ij_min[0]])
+        #no force on G2 because it is an image
 
     #no contact finally
     else :
@@ -255,8 +258,8 @@ class Contact_Image_Tempo_Polygonal:
         self.tangential_old = self.pc_tangential
         if abs(self.ft) > abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
             self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
-
         self.g1.add_F( self.ft*self.pc_tangential, self.g1.l_border[:-1][self.ij_min[0]])
+        #no force on G2 because it is an image
 
         #Damping term
         gamma = -math.log(self.coeff_restitution)/math.sqrt(math.pi**2+math.log(self.coeff_restitution)**2)
@@ -265,7 +268,9 @@ class Contact_Image_Tempo_Polygonal:
         F_2_1_damp_t = -Delta_Us/dt_DEM*eta/2
         F_2_1_damp = F_2_1_damp_t *self.pc_tangential
         self.ft_damp = F_2_1_damp_t
-        self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][self.ij_min[0]])
+        if self.g1.group == 'Current' : #no damping for top and bottom
+            self.g1.add_F( F_2_1_damp, self.g1.l_border[:-1][self.ij_min[0]])
+        #no force on G2 because it is an image
 
     #no contact finally
     else :
