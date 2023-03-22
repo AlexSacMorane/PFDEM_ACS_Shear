@@ -48,7 +48,7 @@ def Discretize_Grains(dict_ic, n_border):
 
 def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):
     """
-    Loading the granular system.
+    Loading the granular system with top wall.
 
         Input :
             an initial condition dictionnary (a dict)
@@ -260,6 +260,213 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         ax2a.tick_params(axis ='y', labelcolor = 'orange')
 
         fig.savefig('Debug/Init_polygons_trackers.png')
+        plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):
+    """
+    Loading the granular system with top group.
+
+        Input :
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a smaple dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a simultion report (a report)
+        Output :
+            Nothing, but initial condition dictionnary is updated
+    """
+    i_DEM_0 = dict_ic['i_DEM_IC']
+    DEM_loop_statut = True
+    #Initialisation
+    dict_ic['L_contact'] = []
+    dict_ic['L_contact_ij'] = []
+    dict_ic['L_contact_gimage'] = []
+    dict_ic['L_contact_ij_gimage'] = []
+    dict_ic['id_contact'] = 0
+    dict_ic['L_g_image'] = []
+    dict_ic['L_i_image'] = []
+
+    #trackers and stop conditions
+    Force_tracker = []
+    Force_stop = 0
+    Ecin_tracker = []
+    Ecin_stop = 0
+    Ymax_tracker = []
+    Fv_tracker = []
+    for grain in dict_ic['L_g_tempo']:
+        Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
+        Ecin_stop = Ecin_stop + 0.5*grain.mass*(dict_ic['Ecin_ratio_IC']*grain.radius/dict_ic['dt_DEM_IC'])**2
+        grain.v = np.array([0, 0])
+
+    while DEM_loop_statut :
+
+        dict_ic['i_DEM_IC'] = dict_ic['i_DEM_IC'] + 1
+
+        #create image
+        for grain in dict_ic['L_g_tempo']:
+            #left wall
+            if (grain.center[0] - dict_sample['x_box_min']) < dict_algorithm['d_to_image'] :
+                if grain.id in dict_ic['L_i_image'] : #image exists
+                    image = dict_ic['L_g_image'][dict_ic['L_i_image'].index(grain.id)]
+                    if image.position == 'right' :
+                        image.position = 'left'
+                else : #image does not exist
+                    dict_ic['L_g_image'].append(Grain_Image_Polygonal(grain, 'left'))
+                    dict_ic['L_i_image'].append(grain.id)
+            #right wall
+            elif (dict_sample['x_box_max'] - grain.center[0]) < dict_algorithm['d_to_image'] :
+                if grain.id in dict_ic['L_i_image'] : #image exists
+                    image = dict_ic['L_g_image'][dict_ic['L_i_image'].index(grain.id)]
+                    if image.position == 'left' :
+                        image.position = 'right'
+                else : #image does not exist
+                    dict_ic['L_g_image'].append(Grain_Image_Polygonal(grain, 'right'))
+                    dict_ic['L_i_image'].append(grain.id)
+            #center
+            else :
+                if grain.id in dict_ic['L_i_image'] : #image exists
+                    i_toremove = dict_ic['L_i_image'].index(grain.id)
+                    dict_ic['L_g_image'].pop(i_toremove)
+                    dict_ic['L_i_image'].pop(i_toremove)
+                    L_i_toremove = []
+                    for ij_gimage in dict_ic['L_contact_ij_gimage'] :
+                        if grain.id == ij_gimage[1] :
+                            L_i_toremove.append(dict_ic['L_contact_ij_gimage'].index(ij_gimage))
+                    L_i_toremove.reverse()
+                    for i_toremove in L_i_toremove:
+                        dict_ic['L_contact_gimage'].pop(i_toremove)
+                        dict_ic['L_contact_ij_gimage'].pop(i_toremove)
+        #translate image
+        for image in dict_ic['L_g_image']:
+            if image.position == 'left' :
+                image.translation(np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0]))
+            elif image.position == 'right' :
+                image.translation(np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0]))
+
+        #Contact detection
+        if (dict_ic['i_DEM_IC']-i_DEM_0-1) % dict_ic['i_update_neighborhoods_com']  == 0:
+            Create_IC_Polygonal.Contact_gg_ic_polygonal.Update_Neighborhoods(dict_ic)
+            Create_IC_Polygonal.Contact_gimage_ic_polygonal.Update_Neighborhoods(dict_ic)
+        Create_IC_Polygonal.Contact_gg_ic_polygonal.Grains_contact_Neighborhoods(dict_ic,dict_material)
+        Create_IC_Polygonal.Contact_gimage_ic_polygonal.Grains_contact_Neighborhoods(dict_ic,dict_material)
+
+        #Sollicitation computation
+        for grain in dict_ic['L_g_tempo']:
+             grain.init_F_control(dict_sollicitation['gravity'])
+        for contact in  dict_ic['L_contact']+dict_ic['L_contact_gimage']:
+            #do not consider the contact inside top and bottom groups
+            if not (contact.g1.group == 'Top' and contact.g2.group =='Top') or not (contact.g1.group == 'Bottom' and contact.g2.group =='Bottom') :
+                contact.normal()
+                contact.tangential(dict_ic['dt_DEM_IC'])
+
+        #Delete contacts gg and gimage with no overlap
+        L_i_toremove = []
+        for i_contact in range(len(dict_ic['L_contact'])):
+            if dict_ic['L_contact'][i_contact].overlap_normal < 0:
+                L_i_toremove.append(i_contact)
+        L_i_toremove.reverse()
+        for i_toremove in L_i_toremove:
+            dict_ic['L_contact'].pop(i_toremove)
+            dict_ic['L_contact_ij'].pop(i_toremove)
+        L_i_toremove = []
+        for i_contact in range(len(dict_ic['L_contact_gimage'])):
+            if dict_ic['L_contact_gimage'][i_contact].overlap_normal < 0:
+                L_i_toremove.append(i_contact)
+        L_i_toremove.reverse()
+        for i_toremove in L_i_toremove:
+            dict_ic['L_contact_gimage'].pop(i_toremove)
+            dict_ic['L_contact_ij_gimage'].pop(i_toremove)
+
+        #Move grains
+        for grain in dict_ic['L_g_tempo']:
+            if grain.group == 'Current' :
+                grain.euler_semi_implicite(dict_ic['dt_DEM_IC'],10*dict_ic['Ecin_ratio_IC'])
+
+        #periodic condition
+        for grain in dict_ic['L_g_tempo']:
+            #left wall
+            if grain.center[0] < dict_sample['x_box_min'] :
+                grain.center = grain.center.copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
+                for i in range(len(grain.l_border)):
+                    grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_max'] - dict_sample['x_box_min'], 0])
+                    grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_max'] - dict_sample['x_box_min']
+                #contact gimage needed to be convert into gg
+                convert_gimage_into_gg(grain, dict_ic, dict_material)
+                #contact gg needed to be convert into gimage
+                convert_gg_into_gimage(grain, dict_ic, dict_material)
+            #right wall
+            elif grain.center[0] > dict_sample['x_box_max'] :
+                grain.center = grain.center.copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
+                for i in range(len(grain.l_border)):
+                    grain.l_border[i] = grain.l_border[i].copy() + np.array([dict_sample['x_box_min'] - dict_sample['x_box_max'], 0])
+                    grain.l_border_x[i] = grain.l_border_x[i].copy() + dict_sample['x_box_min'] - dict_sample['x_box_max']
+                #contact gimage needed to be convert into gg
+                convert_gimage_into_gg(grain, dict_ic, dict_material)
+                #contact gg needed to be convert into gimage
+                convert_gg_into_gimage(grain, dict_ic, dict_material)
+
+        #Control the y_max to have the pressure target
+        dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitation['Vertical_Confinement_Force'], dict_ic['L_g_tempo'])
+        #Apply confinement force
+        for grain in dict_ic['L_g_tempo'] :
+            if grain.group == 'Top':
+                grain.move_as_a_group(np.array([0, dy_top]), dict_algorithm['dt_DEM'])
+        dict_sample['y_box_max'] = dict_sample['y_box_max'] + dy_top
+
+        #Tracker
+        F = F_total(dict_ic['L_g_tempo'])
+        Ecin = E_cin_total(dict_ic['L_g_tempo'])
+        Force_tracker.append(F)
+        Ecin_tracker.append(Ecin)
+        Ymax_tracker.append(dict_sample['y_box_max'])
+        Fv_tracker.append(Fv)
+
+        if dict_ic['i_DEM_IC'] % dict_ic['i_print_plot_IC'] ==0:
+            if dict_sollicitation['gravity'] > 0 :
+                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
+            else :
+                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
+            if dict_ic['Debug_DEM'] :
+                Plot_Config_Loaded_Group(dict_ic)
+
+        #Check stop conditions for DEM
+        if dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC'] + i_DEM_0:
+             DEM_loop_statut = False
+        if dict_sollicitation['gravity'] > 0:
+            if Ecin < Ecin_stop and F < Force_stop and (0.95*dict_sollicitation['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitation['Vertical_Confinement_Force']):
+                  DEM_loop_statut = False
+        else:
+            if Ecin < Ecin_stop and dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC']*0.1 + i_DEM_0 and (0.95*dict_sollicitation['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitation['Vertical_Confinement_Force']):
+                DEM_loop_statut = False
+        if dict_ic['L_g_tempo'] == []:
+            DEM_loop_statut = False
+
+    #update dict
+    dict_ic['Ecin_tracker'] = Ecin_tracker
+    dict_ic['Ymax_tracker'] = Ymax_tracker
+    dict_ic['Fv_tracker'] = Fv_tracker
+
+    #plot trackers
+    if dict_ic['Debug_DEM'] :
+        fig, ((ax1, ax2)) = plt.subplots(1,2, figsize=(16,9),num=1)
+
+        ax1.set_title('Total kinetic energy (e-12 J)')
+        ax1.plot(dict_ic['Ecin_tracker'])
+        ax1.plot([0, len(dict_ic['Ecin_tracker'])-1],[Ecin_stop, Ecin_stop],'r')
+
+        ax2.set_title('About the upper plate')
+        ax2.plot(dict_ic['Ymax_tracker'], color = 'blue')
+        ax2.set_ylabel('Coordinate y (µm)', color = 'blue')
+        ax2.tick_params(axis ='y', labelcolor = 'blue')
+        ax2a = ax2.twinx()
+        ax2a.plot(range(50,len(dict_ic['Fv_tracker'])),dict_ic['Fv_tracker'][50:], color = 'orange')
+        ax2a.plot([50, len(dict_ic['Fv_tracker'])-1],[dict_sollicitation['Vertical_Confinement_Force'], dict_sollicitation['Vertical_Confinement_Force']], color = 'red')
+        ax2a.set_ylabel('Force applied (µN)', color = 'orange')
+        ax2a.tick_params(axis ='y', labelcolor = 'orange')
+
+        fig.savefig('Debug/Init_polygons_group_trackers.png')
         plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -533,6 +740,38 @@ def Reset_y_max(L_g,Force):
 
 #-------------------------------------------------------------------------------
 
+def Control_Top_PID(dict_algorithm, Force_target, L_g):
+    """
+    Control the upper wall to apply force.
+
+    A PID corrector is applied.
+        Input :
+            an algorithm dictionnary (a dict)
+            a confinement value (a float)
+            a list of grain (a list)
+        Output :
+            the displacement of the top group (a float)
+            a force applied on the top group before control (a float)
+    """
+    #compute vertical force applied on top group
+    F = 0
+    for grain in L_g :
+        if grain.group == 'Top':
+            F = F + grain.fy
+    #compare with the target value
+    error = F - Force_target #to have dy_top < 0 is F < Force_target
+    #corrector
+    ki = 0
+    kd = 0
+    dy_top = error * dict_algorithm['kp']
+    #compare with maximum value
+    if abs(dy_top) > dict_algorithm['dy_top_max'] :
+        dy_top = np.sign(dy_top)*dict_algorithm['dy_top_max']
+
+    return dy_top, F
+
+#-------------------------------------------------------------------------------
+
 def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     """
     Plot loaded configuration.
@@ -555,6 +794,30 @@ def Plot_Config_Loaded(dict_ic,x_min,x_max,y_min,y_max,i):
     plt.plot([x_min,x_max],[y_max,y_max],'k')
     plt.axis('equal')
     plt.savefig('Debug/Init_polygons/Config_Loaded_'+str(i)+'.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_Config_Loaded_Group(dict_ic):
+    """
+    Plot loaded configuration.
+
+        Input :
+            a list of temporary grain (a list)
+            the coordinates of the walls (four floats)
+            an iteration (a int)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1,figsize=(16,9))
+    for grain in dict_ic['L_g_tempo']:
+        plt.plot(grain.l_border_x,grain.l_border_y,'k')
+        plt.plot(grain.center[0],grain.center[1],'xk')
+    for grain in dict_ic['L_g_image']:
+        plt.plot(grain.l_border_x,grain.l_border_y,'-.k')
+        plt.plot(grain.center[0],grain.center[1],'xk')
+    plt.axis('equal')
+    plt.savefig('Debug/Init_polygons_group/Config_Loaded_'+str(dict_ic['i_DEM_IC'])+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------

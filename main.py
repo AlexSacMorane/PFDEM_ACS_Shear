@@ -65,6 +65,7 @@ def plan_simulation():
         if dict_ic['Debug_DEM'] :
             os.mkdir('Debug/Init_disks')
             os.mkdir('Debug/Init_polygons')
+            os.mkdir('Debug/Init_polygons_group')
 
     #report
     simulation_report = Report.Report('Debug/Report.txt',datetime.now())
@@ -181,6 +182,36 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, d
 
 #-------------------------------------------------------------------------------
 
+def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report) :
+    """
+    Generate an initial condition.
+
+    Polygons are loaded with top group until a steady-state is detected.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            an initial condition dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a simulation report (a report)
+        Output :
+            Nothing, but dictionnaries are updated
+    """
+    #change Parameters
+    if not dict_ic['Debug_DEM'] :
+        dict_ic['Debug_DEM'] = True
+        os.mkdir('Debug/Init_polygons_group')
+    dict_ic['i_DEM_stop_IC'] = 6000
+    dict_ic['i_print_plot_IC'] = 50
+
+    #load discrete grains
+    simulation_report.tic_tempo(datetime.now())
+    Create_IC_Polygonal.DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report)
+    simulation_report.tac_tempo(datetime.now(), 'Loading with polygons with groups')
+
+#-------------------------------------------------------------------------------
+
 def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, simulation_report):
     '''
     Shear the sample.
@@ -234,7 +265,7 @@ if '__main__' == __name__:
     #ic generation
     generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     define_group(dict_geometry, dict_ic, dict_sample, simulation_report)
-    #need to add step with PID load
+    load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #convert ic to real grain
     from_ic_to_real(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, simulation_report)
