@@ -293,10 +293,11 @@ def DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
     #trackers and stop conditions
     Force_tracker = []
     Force_stop = 0
-    Ecin_tracker = []
+    dict_ic['Ecin_tracker'] = []
     Ecin_stop = 0
-    Ymax_tracker = []
-    Fv_tracker = []
+    dict_ic['Ymax_tracker'] = []
+    dict_ic['Fv_tracker'] = []
+    dict_ic['dy_top_tracker'] = []
     for grain in dict_ic['L_g_tempo']:
         Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
         Ecin_stop = Ecin_stop + 0.5*grain.mass*(dict_ic['Ecin_ratio_IC']*grain.radius/dict_ic['dt_DEM_IC'])**2
@@ -419,11 +420,12 @@ def DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
 
         #Tracker
         F = F_total(dict_ic['L_g_tempo'])
-        Ecin = E_cin_total(dict_ic['L_g_tempo'])
         Force_tracker.append(F)
-        Ecin_tracker.append(Ecin)
-        Ymax_tracker.append(dict_sample['y_box_max'])
-        Fv_tracker.append(Fv)
+        Ecin = E_cin_total(dict_ic['L_g_tempo'])
+        dict_ic['Ecin_tracker'].append(Ecin)
+        dict_ic['dy_top_tracker'].append(dy_top)
+        dict_ic['Ymax_tracker'].append(dict_sample['y_box_max'])
+        dict_ic['Fv_tracker'].append(Fv)
 
         if dict_ic['i_DEM_IC'] % dict_ic['i_print_plot_IC'] ==0:
             if dict_sollicitation['gravity'] > 0 :
@@ -444,11 +446,6 @@ def DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
                 DEM_loop_statut = False
         if dict_ic['L_g_tempo'] == []:
             DEM_loop_statut = False
-
-    #update dict
-    dict_ic['Ecin_tracker'] = Ecin_tracker
-    dict_ic['Ymax_tracker'] = Ymax_tracker
-    dict_ic['Fv_tracker'] = Fv_tracker
 
     #plot trackers
     if dict_ic['Debug_DEM'] :
