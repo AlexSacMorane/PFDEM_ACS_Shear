@@ -241,8 +241,6 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     dict_ic['Ymax_tracker'] = Ymax_tracker
     dict_ic['Fv_tracker'] = Fv_tracker
 
-    simulation_report.write_and_print(str(len(dict_ic['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' polygons have been created\n','\n'+str(len(dict_ic['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' polygons have been created\n')
-
     #plot trackers
     if dict_ic['Debug_DEM'] :
         fig, ((ax1, ax2)) = plt.subplots(1,2, figsize=(16,9),num=1)
