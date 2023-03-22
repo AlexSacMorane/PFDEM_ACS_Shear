@@ -228,7 +228,7 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
 
 if '__main__' == __name__:
 
-    #get data
+    #open simulation and get data
     dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report = plan_simulation()
 
     #ic generation
