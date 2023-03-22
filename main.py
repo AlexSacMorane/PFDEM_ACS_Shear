@@ -177,15 +177,6 @@ def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_soll
         Output :
             Nothing, but dictionnaries are updated
     """
-    #change Parameters
-    if not dict_ic['Debug_DEM'] :
-        dict_ic['Debug_DEM'] = True
-        if Path('Debug/Init_polygons_group').exists():
-            shutil.rmtree('Debug/Init_polygons_group')
-        os.mkdir('Debug/Init_polygons_group')
-    dict_ic['i_DEM_stop_IC'] = 6000
-    dict_ic['i_print_plot_IC'] = 100
-
     #load discrete grains
     print('Load with top group')
     simulation_report.tic_tempo(datetime.now())

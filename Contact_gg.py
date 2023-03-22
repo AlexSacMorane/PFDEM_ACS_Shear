@@ -255,7 +255,6 @@ class Contact:
         self.tangential_old = self.pc_tangential
         if abs(self.ft) > abs(self.mu*self.F_2_1_n) or kt == 0: #Coulomb criteria
             self.ft = self.mu * abs(self.F_2_1_n) * np.sign(self.ft)
-
         self.g1.add_F( self.ft*self.pc_tangential, self.g1.l_border[:-1][self.ij_min[0]])
         self.g2.add_F(-self.ft*self.pc_tangential, self.g2.l_border[:-1][self.ij_min[1]])
 
