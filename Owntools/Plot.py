@@ -48,8 +48,7 @@ def Plot_Config_Loaded(dict_sample,i):
     Plot loaded configuration.
 
         Input :
-            a list of temporary grain (a list)
-            the coordinates of the walls (four floats)
+            a sample dictionnary (a dict)
             an iteration (a int)
         Output :
             Nothing, but a .png file is generated (a file)
@@ -67,6 +66,35 @@ def Plot_Config_Loaded(dict_sample,i):
                 plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
     plt.axis('equal')
     plt.savefig('Debug/Shear/Config_Loaded_'+str(i)+'.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_Contact(dict_sample,i):
+    """
+    Plot contact network.
+
+        Input :
+            a sample dictionnary (a dict)
+            an iteration (a int)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    L_color_group = ['k','r','b']
+    L_group = ['Current', 'Bottom', 'Top']
+    plt.figure(1,figsize=(16,9))
+    for grain in dict_sample['L_g']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group] :
+                plt.plot(grain.l_border_x,grain.l_border_y, L_color_group[i_group])
+    for grain in dict_sample['L_g_image']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group]:
+                plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
+    for contact in dict_sample['L_contact']+dict_sample['L_contact_gimage']:
+        plt.plot([contact.g1.center[0], contact.g2.center[0]], [contact.g1.center[1], contact.g2.center[1]],'k')
+    plt.axis('equal')
+    plt.savefig('Debug/Shear/Contact_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -133,14 +161,14 @@ def Plot_strain_confinement(dict_tracker, dict_sollicitations):
     plt.figure(1, figsize = (16,9))
 
     plt.subplot(121)
-    plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_L'])
+    plt.plot(dict_tracker['shear_L'], dict_tracker['vertical_force_before_L'])
     plt.plot([dict_tracker['shear_L'][0], dict_tracker['shear_L'][-1]], [dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']])
     plt.xlabel('Shear strain (-)')
     plt.ylabel('Vertical confinement force (µN)')
 
     #focus
     perc_confinement_L = []
-    for force in dict_tracker['vertical_force_L'] :
+    for force in dict_tracker['vertical_force_before_L'] :
         perc_confinement_L.append(force/dict_sollicitations['Vertical_Confinement_Force']*100)
     plt.subplot(122)
     plt.plot(dict_tracker['shear_L'], perc_confinement_L)
