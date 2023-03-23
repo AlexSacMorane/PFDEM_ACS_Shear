@@ -51,7 +51,7 @@ def plan_simulation():
             a simulation report (a report)
     """
     #get data
-    dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations = User.All_parameters()
+    dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss = User.All_parameters()
 
     #debug folder
     if Path('Debug').exists():
@@ -82,11 +82,11 @@ def plan_simulation():
     else :
         dict_algorithm['name_folder'] = 'One_Run'
 
-    return dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report
+    return dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report
 
 #-------------------------------------------------------------------------------
 
-def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report) :
+def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report) :
     """
     Generate an initial condition.
 
@@ -106,7 +106,7 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
     """
     #generate and load disks
     simulation_report.tic_tempo(datetime.now())
-    Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
 
     #discretization
@@ -118,7 +118,7 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
     #load discrete grains
     print('Load with top plate')
     simulation_report.tic_tempo(datetime.now())
-    Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with polygons')
 
 #-------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
 
 #-------------------------------------------------------------------------------
 
-def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report) :
+def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report) :
     """
     Generate an initial condition.
 
@@ -176,12 +176,12 @@ def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_soll
     #load discrete grains
     print('Load with top group')
     simulation_report.tic_tempo(datetime.now())
-    Create_IC_Polygonal.DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    Create_IC_Polygonal.DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Loading with polygons with groups')
 
 #-------------------------------------------------------------------------------
 
-def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
+def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report):
     """
     Convert initial configuration to a current one.
 
@@ -199,11 +199,11 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_
     simulation_report.write_and_print('\nConvert initial configuration to current one\n\n', '\nConvert initial configuration to current one\n')
     Owntools.convert_ic_to_real(dict_ic, dict_sample)
     #save
-    Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
 
 #-------------------------------------------------------------------------------
 
-def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitationss, dict_tracker, simulation_report):
     '''
     Shear the sample.
 
@@ -220,12 +220,12 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
     #shear sample
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo(datetime.now())
-    Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitationss, dict_tracker, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Shearing')
 
 #-------------------------------------------------------------------------------
 
-def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
+def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report):
     '''
     Close the simulation.
 
@@ -249,19 +249,19 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
 if '__main__' == __name__:
 
     #open simulation and get data
-    dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report = plan_simulation()
+    dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report = plan_simulation()
 
     #ic generation
-    generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
     define_group(dict_algorithm, dict_ic, dict_sample, simulation_report)
     load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #convert ic to real grain
-    from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
 
     #load
     dict_tracker = {}
-    shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitationss, dict_tracker, simulation_report)
 
     #cose simulation
-    close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
