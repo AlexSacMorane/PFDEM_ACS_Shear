@@ -69,7 +69,9 @@ def Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicit
     sum_dy_top = 0
     n_switch_sign = 0
     Delta_fy = 0
+    n_iteration = 0
     while not conv :
+        n_iteration = n_iteration + 1
         #create image
         L_g_image = []
         for grain in L_top_copy + L_current_copy:
@@ -138,4 +140,4 @@ def Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicit
             for grain in L_top_copy :
                 grain.move_as_a_group(np.array([0, dy_top]), 1) #dt_dEM is set to 1, not used for top group
 
-    return sum_dy_top, fy_sum
+    return sum_dy_top, fy_sum, n_iteration
