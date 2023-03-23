@@ -25,7 +25,7 @@ import Create_IC.Contact_gw_ic
 #Function
 #-------------------------------------------------------------------------------
 
-def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):
+def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
     """
     Create an initial condition
 
@@ -89,7 +89,7 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
         #add element in dict
         dict_sample['y_box_max'] = y_max
 
-        DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report)
+        DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
         #update element in dict
         dict_sample['y_box_min_ic'] = dict_sample['y_box_max']
@@ -105,13 +105,13 @@ def LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample,
         for g_tempo in L_g_tempo:
             dict_ic['L_g_tempo'].append(g_tempo)
 
-    DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report)
+    DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     simulation_report.write_and_print(str(len(dict_ic['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' disks have been created\n','\n'+str(len(dict_ic['L_g_tempo']))+' / '+str(dict_geometry['N_grain'])+' disks have been created\n')
 
 #-------------------------------------------------------------------------------
 
-def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitation, simulation_report):
+def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
     """
     Loading the granular system.
 
@@ -156,7 +156,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
     Ymax_tracker = []
     Fv_tracker = []
     for grain in dict_ic['L_g_tempo']:
-        Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitation['gravity']
+        Force_stop = Force_stop + 0.5*grain.mass*dict_sollicitations['gravity']
         Ecin_stop = Ecin_stop + 0.5*grain.mass*(dict_ic['Ecin_ratio_IC']*grain.radius/dict_ic['dt_DEM_IC'])**2
 
     while DEM_loop_statut :
@@ -218,7 +218,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
 
         #Sollicitation computation
         for grain in dict_ic['L_g_tempo']:
-             grain.init_F_control(dict_sollicitation['gravity'])
+             grain.init_F_control(dict_sollicitations['gravity'])
         for contact in  dict_ic['L_contact']+dict_ic['L_contact_gimage']+dict_ic['L_contact_gw']:
             contact.normal()
             contact.tangential(dict_ic['dt_DEM_IC'])
@@ -263,7 +263,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
             dict_ic['L_g_tempo'].pop(id_grain)
 
         #Control the y_max to have the pressure target
-        dict_sample['y_box_max'], Fv = Control_y_max_NR(dict_sample['y_box_max'],dict_sollicitation['Vertical_Confinement_Force'],dict_ic['L_contact_gw'],dict_ic['L_g_tempo'])
+        dict_sample['y_box_max'], Fv = Control_y_max_NR(dict_sample['y_box_max'],dict_sollicitations['Vertical_Confinement_Force'],dict_ic['L_contact_gw'],dict_ic['L_g_tempo'])
 
         #Tracker
         F = F_total(dict_ic['L_g_tempo'])
@@ -274,21 +274,21 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         Fv_tracker.append(Fv)
 
         if dict_ic['i_DEM_IC'] % dict_ic['i_print_plot_IC'] ==0:
-            if dict_sollicitation['gravity'] > 0 :
-                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
+            if dict_sollicitations['gravity'] > 0 :
+                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Force',int(100*F/Force_stop),'% and Confinement',int(100*Fv/dict_sollicitations['Vertical_Confinement_Force']),'%')
             else :
-                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/dict_sollicitation['Vertical_Confinement_Force']),'%')
+                print('i_DEM',dict_ic['i_DEM_IC'],'and Ecin',int(100*Ecin/Ecin_stop),'% and Confinement',int(100*Fv/dict_sollicitations['Vertical_Confinement_Force']),'%')
             if dict_ic['Debug_DEM'] :
                 Plot_Config_Loaded(dict_ic,dict_sample['x_box_min'],dict_sample['x_box_max'],y_min,dict_sample['y_box_max'],dict_ic['i_DEM_IC'])
 
         #Check stop conditions for DEM
         if dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC'] + i_DEM_0:
              DEM_loop_statut = False
-        if dict_sollicitation['gravity'] > 0:
-            if Ecin < Ecin_stop and F < Force_stop and (0.95*dict_sollicitation['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitation['Vertical_Confinement_Force']):
+        if dict_sollicitations['gravity'] > 0:
+            if Ecin < Ecin_stop and F < Force_stop and (0.95*dict_sollicitations['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitations['Vertical_Confinement_Force']):
                   DEM_loop_statut = False
         else:
-            if Ecin < Ecin_stop and dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC']*0.1 + i_DEM_0 and (0.95*dict_sollicitation['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitation['Vertical_Confinement_Force']):
+            if Ecin < Ecin_stop and dict_ic['i_DEM_IC'] >= dict_ic['i_DEM_stop_IC']*0.1 + i_DEM_0 and (0.95*dict_sollicitations['Vertical_Confinement_Force']<Fv and Fv<1.05*dict_sollicitations['Vertical_Confinement_Force']):
                 DEM_loop_statut = False
         if dict_ic['L_g_tempo'] == []:
             DEM_loop_statut = False
@@ -310,7 +310,7 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         ax2.tick_params(axis ='y', labelcolor = 'blue')
         ax2a = ax2.twinx()
         ax2a.plot(range(50,len(Fv_tracker)),Fv_tracker[50:], color = 'orange')
-        ax2a.plot([50, len(Fv_tracker)-1],[dict_sollicitation['Vertical_Confinement_Force'], dict_sollicitation['Vertical_Confinement_Force']], color = 'red')
+        ax2a.plot([50, len(Fv_tracker)-1],[dict_sollicitations['Vertical_Confinement_Force'], dict_sollicitations['Vertical_Confinement_Force']], color = 'red')
         ax2a.set_ylabel('Force applied (µN)', color = 'orange')
         ax2a.tick_params(axis ='y', labelcolor = 'orange')
 
