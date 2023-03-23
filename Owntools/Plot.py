@@ -196,3 +196,42 @@ def Plot_strain_mu_sample(dict_tracker):
     plt.ylabel('Sample friction (-)')
     plt.savefig('Debug/strain_sample_friction.png')
     plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_confinement_algorithm(dict_tracker):
+    """
+    Plot three plots to analyze the confinement algorithm.
+
+    Plot :
+        Evolution of the number of iterations needed to converge
+        Evolution of the top group displacement
+        Evolution of the difference between after and before vertical force
+
+        Input :
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1, figsize = (16,9))
+
+    plt.subplot(131)
+    plt.plot(dict_tracker['n_iteration_control_y_max_L'],'x')
+    plt.xlabel('Iteration (-)')
+    plt.ylabel('Number of iterations for the algorithm (-)')
+
+    plt.subplot(132)
+    plt.plot(dict_tracker['dy_top_L'],'x')
+    plt.xlabel('Iteration (-)')
+    plt.ylabel('Top group displacement (-)')
+
+    plt.subplot(133)
+    delta_force_L = []
+    for i in range(len(dict_tracker['vertical_force_before_L'])):
+        delta_force_L.append(dict_tracker['vertical_force_after_L'][i] - dict_tracker['vertical_force_before_L'][i])
+    plt.plot(delta_force_L,'x')
+    plt.xlabel('Iteration (-)')
+    plt.ylabel('After - Before Fv (-)')
+
+    plt.savefig('Debug/confinement_algorithm.png')
+    plt.close(1)
