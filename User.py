@@ -130,12 +130,12 @@ def All_parameters():
     #Periodic conditions
     d_to_image = 2 * max(L_R) #distance to wall to generate images
 
-    #PID corrector to apply confinement force on Top group
-    PID_kp = 10**(-8)
-    dy_top_max = R_mean*0.01 #limit the speed of the top group
-    #Apply confinement force (copy algorithm)
+    #PID corrector to apply confinement force on Top group (used in IC generation)
+    PID_kp = 10**(-8) #proportionnal to the error
+    dy_top_max = R_mean*0.01 #limit the displacement of the top group
+    #Apply confinement force (Owntools.Confinement algorithm used during shearing)
     height_to_consider = top_height + 2*R_mean
-    dy_top = R_mean*0.001
+    dy_top = R_mean*0.001 #increment of displacement for top group
 
     #Number of processor
     np_proc = 4
@@ -227,16 +227,21 @@ def All_parameters():
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
 
     #Shear
-    U_shear = R_mean / 1000
+    #U_shear = R_mean / 100000
+    U_shear = 0
     Shear_velocity = U_shear/dt_DEM_IC
     Shear_strain_target = .25 #total shear displacement / initial sample height
+
+    #stop iteration
+    i_DEM_stop = 1000
 
     #write dict
     dict_sollicitations = {
     'gravity' : gravity,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'Shear_velocity' : Shear_velocity,
-    'Shear_strain_target' : Shear_strain_target
+    'Shear_strain_target' : Shear_strain_target,
+    'i_DEM_stop' : i_DEM_stop
     }
 
     #---------------------------------------------------------------------------
