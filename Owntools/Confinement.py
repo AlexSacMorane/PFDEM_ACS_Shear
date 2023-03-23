@@ -53,7 +53,18 @@ class Contact_Image_copy(Contact_gimage.Contact_Image):
 
 def Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicitations):
     """
-    to write
+    Apply the confinement force.
+
+    The top group and upper grain from current group are extracted.
+    The top group is translated until the confinement force (sum of the component y of the force applied on grains) reachs the target value
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            sum_dy_top, fy_sum, n_iteration
     """
     #sort grains
     L_top_copy = []
@@ -131,7 +142,7 @@ def Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicit
         Delta_fy = fy_sum - dict_sollicitations['Vertical_Confinement_Force']
         if Delta_fy*Delta_fy_before < 0 :
             n_switch_sign = n_switch_sign + 1
-        if abs(Delta_fy) < 0.01*dict_sollicitations['Vertical_Confinement_Force']:
+        if abs(Delta_fy) < 0.05*dict_sollicitations['Vertical_Confinement_Force']:
             conv = True
         else :
             dy_top = Delta_fy/abs(Delta_fy)*dict_algorithm['dy_top']/(2**n_switch_sign)
