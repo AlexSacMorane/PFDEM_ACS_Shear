@@ -254,7 +254,7 @@ if '__main__' == __name__:
     #ic generation
     generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
     define_group(dict_algorithm, dict_ic, dict_sample, simulation_report)
-    load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    #load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
 
     #convert ic to real grain
     from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitationss, simulation_report)
