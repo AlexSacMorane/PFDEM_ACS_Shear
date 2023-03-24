@@ -206,6 +206,9 @@ class Grain_Tempo_Polygonal:
       """
       if ymin <= self.center[1] and self.center[1] <= ymax:
           self.group = name_group
+          #stop the grain
+          self.v = np.array([0,0])
+          self.w = 0
           return True
       else :
           return False
