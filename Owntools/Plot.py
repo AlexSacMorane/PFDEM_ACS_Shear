@@ -43,9 +43,9 @@ def Plot_group_distribution(dict_ic):
 
 #-------------------------------------------------------------------------------
 
-def Plot_Config_Loaded(dict_sample,i):
+def Plot_Config_Sheared(dict_sample,i):
     """
-    Plot loaded configuration.
+    Plot loaded configuration during shearing.
 
         Input :
             a sample dictionnary (a dict)
@@ -65,7 +65,34 @@ def Plot_Config_Loaded(dict_sample,i):
             if grain.group == L_group[i_group]:
                 plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
     plt.axis('equal')
-    plt.savefig('Debug/Shear/Config_Loaded_'+str(i)+'.png')
+    plt.savefig('Debug/Shear/Config_'+str(i)+'.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_Config_Confinement(dict_sample,i):
+    """
+    Plot loaded configuration during confinement.
+
+        Input :
+            a sample dictionnary (a dict)
+            an iteration (a int)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    L_color_group = ['k','r','b']
+    L_group = ['Current', 'Bottom', 'Top']
+    plt.figure(1,figsize=(16,9))
+    for grain in dict_sample['L_g']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group] :
+                plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
+    for grain in dict_sample['L_g_image']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group]:
+                plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
+    plt.axis('equal')
+    plt.savefig('Debug/Confinement/Config_'+str(i)+'.png')
     plt.close(1)
 
 #-------------------------------------------------------------------------------
@@ -234,4 +261,16 @@ def Plot_confinement_algorithm(dict_tracker):
     plt.ylabel('After - Before Fv (-)')
 
     plt.savefig('Debug/confinement_algorithm.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_own(x, y, title, path):
+    """
+    to write
+    """
+    plt.figure(1, figsize = (16,9))
+    plt.plot(x,y)
+    plt.title(title)
+    plt.savefig(path)
     plt.close(1)
