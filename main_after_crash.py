@@ -20,6 +20,7 @@ from pathlib import Path
 import main
 import Create_IC
 import Create_IC_Polygonal
+import Confine_Polygonal
 import Contact_gg
 import Contact_gimage
 import Grain
@@ -57,11 +58,19 @@ simulation_report = dict_save['report']
 
 simulation_report.write('\nA crash occurs...\n\n')
 
+#change parameters
+dict_algorithm['dy_top_max'] = dict_geometry['R_mean']*0.001
+dict_sollicitations['i_DEM_stop'] = 2000
+
 #-------------------------------------------------------------------------------
 #main
 #-------------------------------------------------------------------------------
 
 if name_to_load[-14:] =='_ic_save_dicts':
     dict_tracker = {}
+    
+    main.load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    raise ValueError('stop')
+    
     main.shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
     main.close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
