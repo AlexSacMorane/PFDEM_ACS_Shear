@@ -18,6 +18,7 @@ from pathlib import Path
 #Own function and class
 import Create_IC
 import Create_IC_Polygonal
+import Confine_Polygonal
 import Contact_gg
 import Contact_gimage
 import Grain
@@ -203,6 +204,28 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_
 
 #-------------------------------------------------------------------------------
 
+def load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+    '''
+    Load the sample.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
+            a simulation report (a report)
+        Output :
+            Nothing, but dictionnaries are updated
+    '''
+    #shear sample
+    simulation_report.write_and_print('\nConfine the sample\n', 'Confine the sample')
+    simulation_report.tic_tempo(datetime.now())
+    Confine_Polygonal.DEM_confine_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    simulation_report.tac_tempo(datetime.now(), 'Confinement')
+
+#-------------------------------------------------------------------------------
+
 def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     '''
     Shear the sample.
@@ -261,6 +284,10 @@ if '__main__' == __name__:
 
     #load
     dict_tracker = {}
+
+    load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    raise ValueError('stop')
+
     shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
 
     #cose simulation
