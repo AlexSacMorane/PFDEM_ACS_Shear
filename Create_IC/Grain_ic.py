@@ -165,7 +165,7 @@ class Grain_Tempo:
     if self.track_u :
         self.total_ux = self.total_ux + U[0]
         self.total_uy = self.total_uy + U[1]
-        
+
     #rotation
     self.w = 0
 
