@@ -362,7 +362,7 @@ def Grains_contact_Neighborhoods(dict_sample,dict_material):
         for neighbor in grain.neighborhood_image:
             j_neighbor = neighbor.id
             image = neighbor
-            if Grains_Polyhedral_contact_f(grain,image):
+            if Grains_Polyhedral_contact_f(grain,image) and (not (grain.group == 'Top' and image.group =='Top') and not (grain.group == 'Bottom' and image.group =='Bottom')):
                 if (grain.id, image.id) not in dict_sample['L_contact_ij_gimage']:  #contact not detected previously
                    #creation of contact
                    dict_sample['L_contact_ij_gimage'].append((grain.id, image.id))
