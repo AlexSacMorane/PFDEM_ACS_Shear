@@ -113,29 +113,11 @@ def DEM_confine_load(dict_algorithm, dict_material, dict_sample, dict_sollicitat
         #Sollicitation computation
         for grain in dict_sample['L_g']:
              grain.init_F_control(dict_sollicitations['gravity'])
-        for contact in  dict_sample['L_contact']+dict_sample['L_contact_gimage']:
+        for contact in dict_sample['L_contact']+dict_sample['L_contact_gimage']:
             #do not consider the contact inside top and bottom groups
-            if not (contact.g1.group == 'Top' and contact.g2.group =='Top') or not (contact.g1.group == 'Bottom' and contact.g2.group =='Bottom') :
+            if not (contact.g1.group == 'Top' and contact.g2.group =='Top') and not (contact.g1.group == 'Bottom' and contact.g2.group =='Bottom') :
                 contact.normal()
                 contact.tangential(dict_algorithm['dt_DEM'])
-
-        #Delete contacts gg and gimage with no overlap
-        L_i_toremove = []
-        for i_contact in range(len(dict_sample['L_contact'])):
-            if dict_sample['L_contact'][i_contact].overlap_normal < 0:
-                L_i_toremove.append(i_contact)
-        L_i_toremove.reverse()
-        for i_toremove in L_i_toremove:
-            dict_sample['L_contact'].pop(i_toremove)
-            dict_sample['L_contact_ij'].pop(i_toremove)
-        L_i_toremove = []
-        for i_contact in range(len(dict_sample['L_contact_gimage'])):
-            if dict_sample['L_contact_gimage'][i_contact].overlap_normal < 0:
-                L_i_toremove.append(i_contact)
-        L_i_toremove.reverse()
-        for i_toremove in L_i_toremove:
-            dict_sample['L_contact_gimage'].pop(i_toremove)
-            dict_sample['L_contact_ij_gimage'].pop(i_toremove)
 
         #Move grains (only Current)
         for grain in dict_sample['L_g']:

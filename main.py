@@ -277,17 +277,12 @@ if '__main__' == __name__:
     #ic generation
     generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
     define_group(dict_algorithm, dict_ic, dict_sample, simulation_report)
-    #load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #convert ic to real grain
     from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
 
     #load
     dict_tracker = {}
-
-    load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
-    raise ValueError('stop')
-
     shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
 
     #cose simulation
