@@ -10,7 +10,9 @@ This file contains the different functions used in the simulation.
 #Librairies
 #-------------------------------------------------------------------------------
 
+from pathlib import Path
 import matplotlib.pyplot as plt
+import imageio
 
 #Own
 import Grain
@@ -123,6 +125,36 @@ def Plot_Contact(dict_sample,i):
     plt.axis('equal')
     plt.savefig('Debug/Shear/Contact_'+str(i)+'.png')
     plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_mp4(template_name,name_video):
+    '''The goal of this function is to create a movie with pictures.
+
+    from https://www.blog.pythonlibrary.org/2021/06/23/creating-an-animated-gif-with-python/
+
+        Input :
+            the template of the pictures used (a string)
+            the name of the video (a string)
+        Output :
+            a movie file (a .mp4)
+    '''
+    #look for the largest iteration
+    i_f = 0
+    plotpath = Path(template_name+str(i_f)+'.png')
+    while plotpath.exists():
+        i_f = i_f + 1
+        plotpath = Path(template_name+str(i_f)+'.png')
+
+    fileList = []
+    for i in range(0,i_f):
+        fileList.append(template_name+str(i)+'.png')
+
+    duration_movie  = 10 #sec
+    writer = imageio.get_writer(name_video, fps=int(i_f/duration_movie))
+    for im in fileList:
+        writer.append_data(imageio.imread(im))
+    writer.close()
 
 #-------------------------------------------------------------------------------
 

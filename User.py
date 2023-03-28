@@ -227,9 +227,9 @@ def All_parameters():
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
 
     #Shear
-    U_shear = R_mean / 100
+    U_shear = R_mean / 1000
     Shear_velocity = U_shear/dt_DEM_IC
-    Shear_strain_target = 1 #total shear displacement / initial sample height
+    Shear_strain_target = 0.5 #total shear displacement / initial sample height
 
     #stop iteration
     i_DEM_stop = 10000
