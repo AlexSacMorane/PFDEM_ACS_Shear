@@ -70,7 +70,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     #trackers
     dict_tracker['vertical_force_before_L'] = []
     dict_tracker['vertical_force_after_L'] = []
-    dict_tracker['n_iteration_control_y_max_L'] = []
+    #dict_tracker['n_iteration_control_y_max_L'] = []
     dict_tracker['dy_top_L'] = []
     dict_tracker['shear_L'] = []
     dict_tracker['mu_L'] = []
@@ -178,10 +178,10 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
                 sum_fy_top = sum_fy_top + grain.fy
         if sum_fy_top != 0 : #else keep same value
             mu_sample = abs(sum_fx_top / sum_fy_top)
-        print(sum_fy_top)
 
         #Control the top group to have the pressure target
-        dy_top, Fv, n_iteration = Owntools.Confinement.Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
+        #dy_top, Fv, n_iteration = Owntools.Confinement.Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
+        dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitations['Vertical_Confinement_Force'], dict_sample['L_g'])
 
         #copy method is maybe not a good one. Big step, does not consider tangential component for force apply
         #PID method is good but need to work on parameters to get a fast answer
@@ -204,7 +204,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         dict_tracker['compacity_L'].append(Surface_g/((dict_sample['y_box_max']-dict_sample['y_box_min'])*(dict_sample['x_box_max']-dict_sample['x_box_min'])))
         dict_tracker['vertical_force_before_L'].append(sum_fy_top)
         dict_tracker['vertical_force_after_L'].append(Fv)
-        dict_tracker['n_iteration_control_y_max_L'].append(n_iteration)
+        #dict_tracker['n_iteration_control_y_max_L'].append(n_iteration)
         dict_tracker['dy_top_L'].append(dy_top)
         dict_tracker['mu_sample_L'].append(mu_sample)
 
