@@ -212,7 +212,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
             print('i_DEM',dict_algorithm['i_DEM'],': Confinement',int(100*Fv/dict_sollicitations['Vertical_Confinement_Force']),'% Shear',round(Shear_strain,4),'('+str(int(100*Shear_strain/dict_sollicitations['Shear_strain_target']))+' %)')
             if dict_algorithm['Debug_DEM'] :
                 Owntools.Plot.Plot_Config_Sheared(dict_sample,dict_algorithm['i_DEM']) #change function here
-                Owntools.Plot.Plot_Contact(dict_sample,dict_algorithm['i_DEM'])
+                #Owntools.Plot.Plot_Contact(dict_sample,dict_algorithm['i_DEM'])
 
         #add move pf dict_algorithm (put some frenquency)
         #be carefull of the periodic bc
