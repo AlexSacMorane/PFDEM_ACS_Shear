@@ -132,7 +132,7 @@ def All_parameters():
 
     #PID corrector to apply confinement force on Top group (used in IC generation)
     PID_kp = 10**(-7) #proportionnal to the error
-    dy_top_max = R_mean*0.005 #limit the displacement of the top group
+    dy_top_max = R_mean*0.01 #limit the displacement of the top group
     #Apply confinement force (Owntools.Confinement algorithm used during shearing)
     height_to_consider = top_height + 2*R_mean
     dy_top = R_mean*0.0001 #increment of displacement for top group
@@ -229,7 +229,7 @@ def All_parameters():
     #Shear
     U_shear = R_mean / 100
     Shear_velocity = U_shear/dt_DEM_IC
-    Shear_strain_target = .25 #total shear displacement / initial sample height
+    Shear_strain_target = 1 #total shear displacement / initial sample height
 
     #stop iteration
     i_DEM_stop = 10000
