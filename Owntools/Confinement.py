@@ -138,7 +138,6 @@ def Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicit
         fy_sum = 0
         for grain in L_top_copy:
             fy_sum = fy_sum + grain.fy
-        print(fy_sum)
         #compare with target value
         Delta_fy_before = Delta_fy
         Delta_fy = fy_sum - dict_sollicitations['Vertical_Confinement_Force']
