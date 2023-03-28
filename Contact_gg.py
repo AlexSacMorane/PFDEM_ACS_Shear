@@ -362,7 +362,7 @@ def Grains_contact_Neighborhoods(dict_sample, dict_material):
         grain_i = dict_sample['L_g'][i_grain]
         for neighbour in dict_sample['L_g'][i_grain].neighborhood:
             grain_j = neighbour
-            if Grains_Polyhedral_contact_f(grain_i,grain_j):
+            if Grains_Polyhedral_contact_f(grain_i,grain_j) and (not (grain_i.group == 'Top' and grain_j.group =='Top') and not (grain_i.group == 'Bottom' and grain_j.group =='Bottom')): #do not consider top-top or bottom-bottom contacts
                 if (grain_i.id, grain_j.id) not in dict_sample['L_contact_ij']:  #contact not detected previously
                    #creation of contact
                    dict_sample['L_contact_ij'].append((grain_i.id, grain_j.id))
