@@ -263,7 +263,21 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
         Output :
             Nothing, but dictionnaries are updated
     '''
-    pass
+    #make movie of the different configuration
+    if dict_algorithm['Debug_DEM'] :
+        Owntools.Plot.Plot_mp4('Debug/Shear/Config_','Debug/Shear/Configuration.mp4')
+
+    simulation_report.end(datetime.now())
+
+    if dict_algorithm['cleanData'] :
+        pass
+
+    #final save
+    if dict_algorithm['SaveData']:
+        Owntools.Save.save_dicts(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+        name_actual_folder = os.path.dirname(os.path.realpath(__file__))
+        shutil.copytree(name_actual_folder, '../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder'])
+        os.remove(dict_algorithm['name_folder']+'_save_dicts')
 
 #-------------------------------------------------------------------------------
 #main
