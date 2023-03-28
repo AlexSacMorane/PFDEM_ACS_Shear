@@ -238,6 +238,7 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     Owntools.Plot.Plot_strain_compacity(dict_tracker)
     Owntools.Plot.Plot_strain_confinement(dict_tracker, dict_sollicitations)
     Owntools.Plot.Plot_strain_mu_sample(dict_tracker)
+    Owntools.Plot.Plot_strain_dy_top(dict_algorithm, dict_tracker)
 
 #-------------------------------------------------------------------------------
 

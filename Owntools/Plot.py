@@ -226,6 +226,27 @@ def Plot_strain_mu_sample(dict_tracker):
 
 #-------------------------------------------------------------------------------
 
+def Plot_strain_dy_top(dict_algorithm, dict_tracker):
+    """
+    Plot the curve strain - dy of the top group.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a tracker dictionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    plt.figure(1, figsize = (16,9))
+    plt.plot(dict_tracker['shear_L'], dict_tracker['dy_top_L'])
+    plt.plot([dict_tracker['shear_L'][0],dict_tracker['shear_L'][-1]], [-dict_algorithm['dy_top_max'], -dict_algorithm['dy_top_max']], 'r')
+    plt.plot([dict_tracker['shear_L'][0],dict_tracker['shear_L'][-1]], [ dict_algorithm['dy_top_max'],  dict_algorithm['dy_top_max']], 'r')
+    plt.xlabel('Shear strain (-)')
+    plt.ylabel('dy Top group (µm)')
+    plt.savefig('Debug/strain_dy_top.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def Plot_confinement_algorithm(dict_tracker):
     """
     Plot three plots to analyze the confinement algorithm.
