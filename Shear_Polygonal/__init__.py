@@ -182,6 +182,11 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
 
         #Control the top group to have the pressure target
         dy_top, Fv, n_iteration = Owntools.Confinement.Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
+
+        #copy method is maybe not a good one. Big step, does not consider tangential component for force apply
+        #PID method is good but need to work on parameters to get a fast answer
+
+
         #Shear the top group and apply confinement force
         for grain in dict_sample['L_g'] :
             if grain.group == 'Top':
