@@ -45,7 +45,7 @@ def All_parameters():
     for i in range(len(L_R)):
         R_mean = R_mean + L_R[i]*L_percentage_R[i]
     #Grain discretization
-    discretization = 60
+    discretization = 100
 
     #Write dict
     dict_geometry = {
