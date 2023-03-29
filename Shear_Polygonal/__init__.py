@@ -53,6 +53,9 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
         if max(grain.l_border_y) > max_value :
             max_value = max(grain.l_border_y)
     Sample_height = max_value - min_value
+    #compute the inertial number
+    dict_sample['I_number'] = dict_sollicitations['Shear_velocity']/Sample_height*2*dict_geometry['R_mean']*math.sqrt(dict_material['rho_surf']*dict_sollicitations['Vertical_Confinement_Linear_Force'])
+    simulation_report.write_and_print('Inertial number : '+str(dict_sample['I_number'])+'\n\n','Inertial number : '+str(dict_sample['I_number'])+'\n')
     #track total displacement of grains
     for grain in dict_sample['L_g'] :
         grain.track_u = True

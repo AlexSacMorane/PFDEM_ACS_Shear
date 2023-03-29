@@ -269,8 +269,8 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
 
     simulation_report.end(datetime.now())
 
-    if dict_algorithm['cleanData'] :
-        pass
+    #if dict_algorithm['cleanData'] :
+    #    pass
 
     #final save
     if dict_algorithm['SaveData']:

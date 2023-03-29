@@ -237,6 +237,7 @@ def All_parameters():
     #write dict
     dict_sollicitations = {
     'gravity' : gravity,
+    'Vertical_Confinement_Linear_Force' : Vertical_Confinement_Linear_Force,
     'Vertical_Confinement_Force' : Vertical_Confinement_Force,
     'Shear_velocity' : Shear_velocity,
     'Shear_strain_target' : Shear_strain_target,
