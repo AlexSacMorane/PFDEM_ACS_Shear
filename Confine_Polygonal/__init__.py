@@ -18,7 +18,7 @@ import math
 from Grain import Grain, Grain_Image
 import Contact_gg
 import Contact_gimage
-import Owntools=
+import Owntools
 import Owntools.Plot
 
 #-------------------------------------------------------------------------------
