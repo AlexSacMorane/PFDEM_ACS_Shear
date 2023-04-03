@@ -35,7 +35,7 @@ def All_parameters():
     #Geometric parameters
 
     #Total number of grains
-    N_grain = 30
+    N_grain = 40
     #Disk
     R_mean = 250 #µm radius to compute the grain distribution. Then recomputed
     L_R = [R_mean] #from larger to smaller
@@ -105,22 +105,16 @@ def All_parameters():
     #Phase field
     dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF
-    factor_distribution_etai = 1.5 #margin to distribute etai
-    n_local = 40 #number of node inside local PF simulation
-    dx_local = 2*min(dict_geometry['L_R'])/(n_local-1)
-    dy_local = 2*min(dict_geometry['L_R'])/(n_local-1)
-
-    #From those date, add variables into material dict
-    w = 4*math.sqrt(dx_local**2+dy_local**2)
-    double_well_height = 10*dict_material['kc_pf']/w/w
-    dict_material['w'] = w
-    dict_material['double_well_height'] = double_well_height
+    factor_distribution_etai = 1.6 #margin to distribute etai
+    n_local = 40 #estimation number of node in one axis for a grain
+    n_x = int(n_local * (x_box_max-x_box_min)/(2*R_mean)) #number of nodes in x-axis
+    n_y = int(n_local * H_L_ratio*(x_box_max-x_box_min)/(2*R_mean)) #number of nodes in y-axis
 
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
     dt_DEM = dt_DEM_crit/6 #s time step during DEM simulation
     factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 500 #the frequency of the update of the neighborhood of the grains and the walls
+    i_update_neighborhoods = 10 #the frequency of the update of the neighborhood of the grains and the walls
 
     #Groups definition
     bottom_height = 1.5*R_mean #bottom group
@@ -150,9 +144,8 @@ def All_parameters():
     'dt_PF' : dt_PF,
     'n_t_PF' : n_t_PF,
     'factor_distribution_etai' : factor_distribution_etai,
-    'n_local' : n_local,
-    'dx_local' : dx_local,
-    'dy_local' : dy_local,
+    'n_x' : n_x,
+    'n_y' : n_y,
     'dt_DEM_crit' : dt_DEM_crit,
     'dt_DEM' : dt_DEM,
     'factor_neighborhood' : factor_neighborhood,
@@ -177,7 +170,7 @@ def All_parameters():
 
     #grains generation
     n_generation = 1 #number of grains generation
-    factor_ymax_box = 1.5 #margin to generate grains
+    factor_ymax_box = 1.6 #margin to generate grains
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
 
     #current dem step

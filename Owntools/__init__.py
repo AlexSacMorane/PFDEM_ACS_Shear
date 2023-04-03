@@ -148,3 +148,61 @@ def convert_ic_to_real(dict_ic, dict_sample):
     dict_sample['L_g'] = []
     for grain_tempo in dict_ic['L_g_tempo'] :
         dict_sample['L_g'].append(Grain.Grain(grain_tempo))
+
+#-------------------------------------------------------------------------------
+
+def create_mesh(dict_algorithm, dict_material, dict_sample):
+    """
+    Create a mesh for the simulation.
+
+    Material dictionnary is updated.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            a mesh is generated in the dict_sample (a nx x ny numpy array)
+            a material dictionnary is updated (two floats)
+    """
+    #create mesh and update dictionnary
+    dict_sample['x_L'] = np.linspace(dict_sample['x_box_min'], dict_sample['x_box_max'], dict_algorithm['n_x'])
+    dict_sample['y_L'] = np.linspace(dict_sample['y_box_min'], dict_sample['y_box_max'], dict_algorithm['n_y'])
+
+    #plot mesh
+    if dict_algorithm['Debug'] :
+        Owntools.Plot.Plot_mesh(dict_sample)
+
+    #From those date, add variables into material dict
+    w = 4*math.sqrt((dict_sample['x_L'][1]-dict_sample['x_L'][0])**2+(dict_sample['y_L'][1]-dict_sample['y_L'][0])**2)
+    double_well_height = 10*dict_material['kc_pf']/w/w
+    dict_material['w'] = w
+    dict_material['double_well_height'] = double_well_height
+
+#-------------------------------------------------------------------------------
+
+def Cosine_Profile(R,r,w):
+    '''
+    Compute the phase field variable at some point.
+
+    A cosine profile is assumed (see https://mooseframework.inl.gov/source/ics/SmoothCircleIC.html).
+
+    Input :
+        the radius R of the grain in the direction (a float)
+        the distance r between the current point and the center (a float)
+        the width w of the interface (a float)
+    Output :
+        the value of the phase field variable (a float)
+    '''
+    #inside the grain
+    if r<R-w/2:
+        return 1
+    #outside the grain
+    elif r>R+w/2:
+        return 0
+    #inside the interface
+    else :
+        return 0.5*(1 + math.cos(math.pi*(r-R+w/2)/w))
+
+#-------------------------------------------------------------------------------
+

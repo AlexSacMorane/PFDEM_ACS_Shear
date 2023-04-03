@@ -13,6 +13,9 @@ This file contains functions used in the simulation to define grains.
 import math
 import numpy as np
 
+#Own
+import Owntools
+
 #-------------------------------------------------------------------------------
 #Class
 #-------------------------------------------------------------------------------
@@ -192,6 +195,60 @@ class Grain:
           return True
       else :
           return False
+
+#---------------------------------------------------------------------------
+
+  def build_etai_M(self,dict_material,dict_sample):
+        '''
+        Build the phase field for one grain.
+
+        A cosine profile is assumed (see https://mooseframework.inl.gov/source/ics/SmoothCircleIC.html).
+
+            Input :
+                itself (a grain)
+                a material dictionnary (a dictionnary)
+                a sample dictionnary (a dictionnary)
+            Output :
+                Nothing but the grain gets a new attribute (a n_y x n_x numpy array)
+        '''
+        #initilization
+        self.etai_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+
+        #extract a spatial zone
+        x_min = min(self.l_border_x)-dict_material['w']
+        x_max = max(self.l_border_x)+dict_material['w']
+        y_min = min(self.l_border_y)-dict_material['w']
+        y_max = max(self.l_border_y)+dict_material['w']
+
+        #look for this part inside the global mesh
+        #create search list
+        x_L_search_min = abs(np.array(dict_sample['x_L'])-x_min)
+        x_L_search_max = abs(np.array(dict_sample['x_L'])-x_max)
+        y_L_search_min = abs(np.array(dict_sample['y_L'])-y_min)
+        y_L_search_max = abs(np.array(dict_sample['y_L'])-y_max)
+
+        #get index
+        i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+        i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+        i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+        i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
+
+        for l in range(i_y_min,i_y_max+1):
+            for c in range(i_x_min,i_x_max+1):
+                y = dict_sample['y_L'][-1-l]
+                x = dict_sample['x_L'][c]
+                p = np.array([x,y])
+                r = np.linalg.norm(self.center - p)
+                #look for the radius on this direction
+                if p[1]>self.center[1]:
+                    theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                else :
+                    theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
+                R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+                #build etai_M
+                self.etai_M[l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
 
 #-------------------------------------------------------------------------------
 

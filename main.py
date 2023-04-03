@@ -21,6 +21,7 @@ import Create_IC_Polygonal
 import Confine_Polygonal
 import Contact_gg
 import Contact_gimage
+import Etai
 import Grain
 import Shear_Polygonal
 import Report
@@ -226,6 +227,33 @@ def load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations,
 
 #-------------------------------------------------------------------------------
 
+def define_etai(dict_algorithm, dict_material, dict_sample, simulation_report):
+    '''
+    Define the etai to describe the sample.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a simulation report (a report)
+        Output :
+            Nothing, but sample dictionnary is updated with etais
+    '''
+    simulation_report.write_and_print('\nDefining the etais\n', 'Defining the etais')
+    simulation_report.tic_tempo(datetime.now())
+    #build phase field for grains
+    for grain in dict_sample['L_g']:
+        grain.build_etai_M(dict_material,dict_sample)
+    #build etais
+    dict_sample['L_etai'] = list([])
+    for group in ['Top', 'Current', 'Bottom'] :
+        Etai.etai_distribution(dict_algorithm, dict_sample, simulation_report, group)
+    if dict_algorithm['Debug']:
+        Owntools.Plot.Plot_etais(dict_sample)
+    simulation_report.tac_tempo(datetime.now(), 'Defining the etais')
+
+#-------------------------------------------------------------------------------
+
 def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     '''
     Shear the sample.
@@ -295,6 +323,12 @@ if '__main__' == __name__:
 
     #convert ic to real grain
     from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+
+    #create mesh
+    Owntools.create_mesh(dict_algorithm, dict_material, dict_sample)
+
+    #reate etais
+    define_etai(dict_algorithm, dict_material, dict_sample, simulation_report)
 
     #load
     dict_tracker = {}

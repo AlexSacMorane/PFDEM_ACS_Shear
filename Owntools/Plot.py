@@ -45,6 +45,65 @@ def Plot_group_distribution(dict_ic):
 
 #-------------------------------------------------------------------------------
 
+def Plot_mesh(dict_sample):
+    """
+    Plot group distribution and mesh.
+
+        Input :
+            a sample disctionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    L_color_group = ['k','r','b']
+    L_group = ['Current', 'Bottom', 'Top']
+    fig = plt.figure(1,figsize=(16,9.12))
+    #x-axis
+    for x in dict_sample['x_L']:
+        plt.plot([x, x],[dict_sample['y_L'][0], dict_sample['y_L'][-1]],'k')
+    #y-axis
+    for y in dict_sample['y_L']:
+        plt.plot([dict_sample['x_L'][0], dict_sample['x_L'][-1]],[y, y],'k')
+    #grains
+    for grain in dict_sample['L_g']:
+        for i_group in range(len(L_group)):
+            if grain.group == L_group[i_group] :
+                plt.plot(grain.l_border_x, grain.l_border_y, L_color_group[i_group])
+    plt.axis("equal")
+    fig.savefig('Debug/Mesh.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
+def Plot_etais(dict_sample):
+    """
+    Plot etais distribution.
+
+        Input :
+            a sample disctionnary (a dict)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    fig = plt.figure(1,figsize=(16,9.12))
+
+    L_color = ['red', 'royalblue', 'forestgreen', 'gold', 'hotpink', 'skyblue', 'chocolate', 'darkkhaki', 'darkorchid', 'silver']
+    #etas
+    etas_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+    for etai in dict_sample['L_etai']:
+        etas_M = etas_M + etai.etai_M
+    im = plt.imshow(etas_M, interpolation='nearest', extent=[min(dict_sample['x_L']),max(dict_sample['x_L']), min(dict_sample['y_L']),max(dict_sample['y_L'])], vmin = 0, vmax = 1)
+    plt.colorbar(im)
+    #grains
+    for i in range(len(dict_sample['L_g'])):
+        plt.plot(dict_sample['L_g'][i].l_border_x,dict_sample['L_g'][i].l_border_y,color=L_color[dict_sample['L_g'][i].etai],linewidth=3)
+    plt.title('Phase field and grains')
+    plt.axis('equal')
+    plt.xlim(min(dict_sample['x_L']),max(dict_sample['x_L']))
+    plt.axis("equal")
+    fig.savefig('Debug/Etais.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def Plot_Config_Sheared(dict_sample,i):
     """
     Plot loaded configuration during shearing.
