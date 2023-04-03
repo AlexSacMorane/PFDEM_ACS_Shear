@@ -19,7 +19,6 @@ from Grain import Grain, Grain_Image
 import Contact_gg
 import Contact_gimage
 import Owntools
-import Owntools.Confinement
 import Owntools.Plot
 
 
@@ -187,7 +186,6 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
             mu_sample = abs(sum_fx_top / sum_fy_top)
 
         #Control the top group to have the pressure target
-        #dy_top, Fv, n_iteration = Owntools.Confinement.Control_y_max_copy(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
         dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitations['Vertical_Confinement_Force'], dict_sample['L_g'])
 
         #copy method is maybe not a good one. Big step, does not consider tangential component for force apply

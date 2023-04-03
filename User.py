@@ -132,9 +132,6 @@ def All_parameters():
     #PID corrector to apply confinement force on Top group (used in IC generation)
     PID_kp = 10**(-7) #proportionnal to the error
     dy_top_max = R_mean*0.001 #limit the displacement of the top group
-    #Apply confinement force (Owntools.Confinement algorithm used during shearing)
-    height_to_consider = top_height + 2*R_mean
-    dy_top = R_mean*0.0001 #increment of displacement for top group
 
     #Number of processor
     np_proc = 4
@@ -165,8 +162,6 @@ def All_parameters():
     'd_to_image' : d_to_image,
     'kp' : PID_kp,
     'dy_top_max' : dy_top_max,
-    'height_to_consider' : height_to_consider,
-    'dy_top' : dy_top,
     'np_proc' : np_proc,
     'Debug' : Debug,
     'Debug_DEM' : Debug_DEM,
