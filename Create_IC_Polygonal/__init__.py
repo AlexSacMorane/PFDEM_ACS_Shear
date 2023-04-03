@@ -236,6 +236,14 @@ def DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollic
         if dict_ic['L_g_tempo'] == []:
             DEM_loop_statut = False
 
+    #analyze the sample configuration
+    overlap_r_mean = 0
+    n_mean = 0
+    for contact in dict_ic['L_contact'] + dict_ic['L_contact_gimage']:
+        overlap_r_mean = overlap_r_mean + contact.overlap_normal*2/(contact.g1.r_max+contact.g2.r_max)
+        n_mean = n_mean + 1
+    simulation_report.write_and_print('Overlap / mean radius is '+str(round(overlap_r_mean/n_mean,3))+'\n\n','Overlap / mean radius is '+str(round(overlap_r_mean/n_mean,3))+'\n')
+
     #update dict
     dict_ic['Ecin_tracker'] = Ecin_tracker
     dict_ic['Ymax_tracker'] = Ymax_tracker
@@ -410,7 +418,7 @@ def DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_
 
         #Control the y_max to have the pressure target
         dy_top, Fv = Control_Top_PID(dict_algorithm, dict_sollicitations['Vertical_Confinement_Force'], dict_ic['L_g_tempo'])
-        
+
         #Apply confinement force
         for grain in dict_ic['L_g_tempo'] :
             if grain.group == 'Top':
