@@ -197,7 +197,7 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_
         Output :
             Nothing, but dictionnaries are updated
     """
-    simulation_report.write_and_print('\nConvert initial configuration to current one\n\n', '\nConvert initial configuration to current one\n')
+    simulation_report.write_and_print('Convert initial configuration to current one\n\n', '\nConvert initial configuration to current one\n')
     Owntools.convert_ic_to_real(dict_ic, dict_sample)
     #save
     Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
@@ -226,12 +226,13 @@ def load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations,
 
 #-------------------------------------------------------------------------------
 
-def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     '''
     Shear the sample.
 
         Input :
             an algorithm dictionnary (a dict)
+            a geometry disctionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
@@ -243,7 +244,7 @@ def shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations
     #shear sample
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo(datetime.now())
-    Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
     simulation_report.tac_tempo(datetime.now(), 'Shearing')
 
 #-------------------------------------------------------------------------------
@@ -297,7 +298,7 @@ if '__main__' == __name__:
 
     #load
     dict_tracker = {}
-    shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
 
     #cose simulation
     close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
