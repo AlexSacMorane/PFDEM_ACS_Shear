@@ -27,12 +27,13 @@ import Owntools.Plot
 #Function
 #-------------------------------------------------------------------------------
 
-def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
+def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     """
     Loading the granular system with vertical load and shear.
 
         Input :
             an algorithm dictionnary (a dict)
+            a geometry dictionnary (a dict)
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitation dictionnary (a dict)
@@ -55,7 +56,10 @@ def DEM_shear_load(dict_algorithm, dict_material, dict_sample, dict_sollicitatio
     Sample_height = max_value - min_value
     #compute the inertial number
     dict_sample['I_number'] = dict_sollicitations['Shear_velocity']/Sample_height*2*dict_geometry['R_mean']*math.sqrt(dict_material['rho_surf']*dict_sollicitations['Vertical_Confinement_Linear_Force'])
-    simulation_report.write_and_print('Inertial number : '+str(dict_sample['I_number'])+'\n\n','Inertial number : '+str(dict_sample['I_number'])+'\n')
+    simulation_report.write_and_print('Inertial number : '+str(dict_sample['I_number'])+'\n','Inertial number : '+str(dict_sample['I_number']))
+    #must be under 10-3 to consider critical state
+    simulation_report.write_and_print('Expected number of iterations : '+str(int(dict_sollicitations['Shear_strain_target']*Sample_height/(dict_sollicitations['Shear_velocity']*dict_algorithm['dt_DEM'])))+'\n\n','Expected number of iterations : '+str(int(dict_sollicitations['Shear_strain_target']*Sample_height/(dict_sollicitations['Shear_velocity']*dict_algorithm['dt_DEM'])))+'\n')
+
     #track total displacement of grains
     for grain in dict_sample['L_g'] :
         grain.track_u = True
