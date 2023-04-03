@@ -35,11 +35,11 @@ def All_parameters():
     #Geometric parameters
 
     #Total number of grains
-    N_grain = 80
+    N_grain = 30
     #Disk
-    R_mean = 350 #µm radius to compute the grain distribution. Then recomputed
-    L_R = [1.2*R_mean,1.1*R_mean,0.9*R_mean,0.8*R_mean] #from larger to smaller
-    L_percentage_R = [1/6,1/3,1/3,1/6] #distribution of the different radius
+    R_mean = 250 #µm radius to compute the grain distribution. Then recomputed
+    L_R = [R_mean] #from larger to smaller
+    L_percentage_R = [1] #distribution of the different radius
     #Recompute the mean radius
     R_mean = 0
     for i in range(len(L_R)):
@@ -87,9 +87,9 @@ def All_parameters():
     #Sample definition
 
     #Box définition
-    H_D_ratio = 1.5
+    H_L_ratio = (5/6)
     x_box_min = 0 #µm
-    x_box_max = 2*R_mean*math.sqrt(N_grain/H_D_ratio) #µm
+    x_box_max = 2*R_mean*math.sqrt(N_grain/H_L_ratio) #µm
     y_box_min = 0 #µm
 
     #Write dict
@@ -118,21 +118,20 @@ def All_parameters():
 
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
-    dt_DEM = dt_DEM_crit/8 #s time step during DEM simulation
-    factor_neighborhood = 1 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 1 #the frequency of the update of the neighborhood of the grains and the walls
-    Spring_type = 'Ponctual' #Kind of contact
+    dt_DEM = dt_DEM_crit/6 #s time step during DEM simulation
+    factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods = 500 #the frequency of the update of the neighborhood of the grains and the walls
 
     #Groups definition
-    bottom_height = 2*R_mean #bottom group
-    top_height = 2*R_mean #top group
+    bottom_height = 1.5*R_mean #bottom group
+    top_height = 1.5*R_mean #top group
 
     #Periodic conditions
     d_to_image = 2 * max(L_R) #distance to wall to generate images
 
     #PID corrector to apply confinement force on Top group (used in IC generation)
     PID_kp = 10**(-7) #proportionnal to the error
-    dy_top_max = R_mean*0.01 #limit the displacement of the top group
+    dy_top_max = R_mean*0.001 #limit the displacement of the top group
     #Apply confinement force (Owntools.Confinement algorithm used during shearing)
     height_to_consider = top_height + 2*R_mean
     dy_top = R_mean*0.0001 #increment of displacement for top group
@@ -161,7 +160,6 @@ def All_parameters():
     'dt_DEM' : dt_DEM,
     'factor_neighborhood' : factor_neighborhood,
     'i_update_neighborhoods': i_update_neighborhoods,
-    'Spring_type' : Spring_type,
     'bottom_height' : bottom_height,
     'top_height' : top_height,
     'd_to_image' : d_to_image,
@@ -188,7 +186,7 @@ def All_parameters():
     N_test_max = 5000 # maximum number of tries to generate a grain without overlap
 
     #current dem step
-    dt_DEM_IC = dt_DEM_crit/6 #s time step during IC
+    dt_DEM_IC = dt_DEM_crit/5 #s time step during IC
     factor_neighborhood_IC = 1.5 #margin to detect a grain into a neighborhood
     i_update_neighborhoods_gen = 20 #the frequency of the update of the neighborhood of the grains and the walls during IC generations
     i_update_neighborhoods_com = 100 #the frequency of the update of the neighborhood of the grains and the walls during IC combination
@@ -199,7 +197,7 @@ def All_parameters():
 
     #debugging
     Debug_DEM_IC = False #plot configuration inside DEM during IC
-    i_print_plot_IC = 300 #frenquency of the print and plot (if Debug_DEM_IC) for IC
+    i_print_plot_IC = 200 #frenquency of the print and plot (if Debug_DEM_IC) for IC
 
     #write dict
     dict_ic = {
@@ -223,13 +221,13 @@ def All_parameters():
     gravity = 0 #µm/s2
 
     #Confinement load
-    Vertical_Confinement_Linear_Force = Y*4*R_mean/1000 #µN/µm used to compute the Vertical_Confinement_Force
+    Vertical_Confinement_Linear_Force = Y*4*R_mean/800 #µN/µm used to compute the Vertical_Confinement_Force
     Vertical_Confinement_Force = Vertical_Confinement_Linear_Force*(x_box_max-x_box_min) #µN
 
     #Shear
     U_shear = R_mean / 1000
-    Shear_velocity = U_shear/dt_DEM_IC
-    Shear_strain_target = 0.5 #total shear displacement / initial sample height
+    Shear_velocity = U_shear/dt_DEM
+    Shear_strain_target = 1 #total shear displacement / initial sample height
 
     #stop iteration
     i_DEM_stop = 10000
