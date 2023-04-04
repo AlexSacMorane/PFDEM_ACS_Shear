@@ -93,8 +93,8 @@ def Plot_etais(dict_sample):
     im = plt.imshow(etas_M, interpolation='nearest', extent=[min(dict_sample['x_L']),max(dict_sample['x_L']), min(dict_sample['y_L']),max(dict_sample['y_L'])], vmin = 0, vmax = 1)
     plt.colorbar(im)
     #grains
-    for i in range(len(dict_sample['L_g'])):
-        plt.plot(dict_sample['L_g'][i].l_border_x,dict_sample['L_g'][i].l_border_y,color=L_color[dict_sample['L_g'][i].etai],linewidth=3)
+    for grain in dict_sample['L_g']:
+        plt.plot(grain.l_border_x,grain.l_border_y,color=L_color[grain.etai],linewidth=3)
     plt.title('Phase field and grains')
     plt.axis('equal')
     plt.xlim(min(dict_sample['x_L']),max(dict_sample['x_L']))
