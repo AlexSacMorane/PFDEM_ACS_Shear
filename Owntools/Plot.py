@@ -117,6 +117,10 @@ def Plot_Config_Sheared(dict_sample,i):
     L_color_group = ['k','r','b']
     L_group = ['Current', 'Bottom', 'Top']
     plt.figure(1,figsize=(16,9))
+    #solute
+    im = plt.imshow(dict_sample['solute_M'], interpolation='nearest', extent=[min(dict_sample['x_L']),max(dict_sample['x_L']), min(dict_sample['y_L']),max(dict_sample['y_L'])], vmin = 0, vmax = 0.1)
+    plt.colorbar(im)
+    #grains
     for grain in dict_sample['L_g']:
         for i_group in range(len(L_group)):
             if grain.group == L_group[i_group] :
@@ -125,6 +129,7 @@ def Plot_Config_Sheared(dict_sample,i):
         for i_group in range(len(L_group)):
             if grain.group == L_group[i_group]:
                 plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
+    plt.title('Solute and grains')
     plt.axis('equal')
     plt.savefig('Debug/Shear/Config_'+str(i)+'.png')
     plt.close(1)
