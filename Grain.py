@@ -233,10 +233,9 @@ class Grain:
         i_y_min = list(y_L_search_min).index(min(y_L_search_min))
         i_y_max = list(y_L_search_max).index(min(y_L_search_max))
 
-
         for l in range(i_y_min,i_y_max+1):
             for c in range(i_x_min,i_x_max+1):
-                y = dict_sample['y_L'][-1-l]
+                y = dict_sample['y_L'][l]
                 x = dict_sample['x_L'][c]
                 p = np.array([x,y])
                 r = np.linalg.norm(self.center - p)
@@ -248,7 +247,7 @@ class Grain:
                 L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
                 R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
                 #build etai_M
-                self.etai_M[l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
+                self.etai_M[-1-l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
 
 #-------------------------------------------------------------------------------
 
