@@ -220,10 +220,8 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
                 dict_sample['L_g'][i_grain].dtheta_pf_interpolation = 0
             #update map of etai
             simulation_report.tac_2nd_tempo('Update phase fields')
-            simulation_report.tic_2nd_tempo()
             #move solute
             Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
-            simulation_report.tac_2nd_tempo('Update solute')
 
         #add pf simulation (new module) and pf->DEM and DEM->PF
 
