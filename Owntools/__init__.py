@@ -10,9 +10,14 @@ This file contains the different functions used in the simulation.
 #Librairies
 #-------------------------------------------------------------------------------
 
+import numpy as np
+import math
+
+#Own
 import Grain
 import Contact_gg
 import Contact_gimage
+import Owntools.Plot
 
 #-------------------------------------------------------------------------------
 #functions
@@ -203,6 +208,3 @@ def Cosine_Profile(R,r,w):
     #inside the interface
     else :
         return 0.5*(1 + math.cos(math.pi*(r-R+w/2)/w))
-
-#-------------------------------------------------------------------------------
-
