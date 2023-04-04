@@ -78,7 +78,7 @@ def etai_distribution(dict_algorithm, dict_sample, simulation_report, group):
         Output :
             Nothing, but the sample dictionnary is updated with the list of the etai (a list)
     '''
-    #xtraction of grains in the group
+    #extraction of grains in the group
     L_g_extract = []
     for grain in dict_sample['L_g']:
         if grain.group == group:
@@ -95,29 +95,32 @@ def etai_distribution(dict_algorithm, dict_sample, simulation_report, group):
             if np.linalg.norm(grain1.center - grain2.center) < dict_algorithm['factor_distribution_etai'] * (grain1.r_max+grain2.r_max):
                 grain1.ig_near_L.append(i_grain2)
                 grain2.ig_near_L.append(i_grain1)
+    #what about the bc!!
+
     #first try
+    etai_0 = len(dict_sample['L_etai'])
     n_etai_L = [1]
-    L_etai = [len(dict_sample['L_etai'])]
+    L_etai = [etai_0]
     L_ig_etai = [[0]]
-    L_g_extract[0].id_eta = len(dict_sample['L_etai'])
-    for grain in L_g_extract:
-        if len(dict_sample['L_etai']) in grain.ig_near_L:
-            grain.eta_near_L.append(len(dict_sample['L_etai']))
+    L_g_extract[0].id_eta = etai_0
+    for grain in L_g_extract[1:]:
+        if 0 in grain.ig_near_L:
+            grain.eta_near_L.append(etai_0)
     for i_grain in range(1,len(L_g_extract)):
         grain = L_g_extract[i_grain]
         etai_defined = False
-        etai = len(dict_sample['L_etai'])
-        while etai < len(L_etai) and not etai_defined:
+        etai = etai_0
+        while etai-etai_0 < len(L_etai) and not etai_defined:
             if etai not in grain.eta_near_L:
                 grain.id_eta = etai
                 etai_defined = True
-                n_etai_L[etai] = n_etai_L[etai] + 1
-                L_ig_etai[etai].append(i_grain)
+                n_etai_L[etai-etai_0] = n_etai_L[etai-etai_0] + 1
+                L_ig_etai[etai-etai_0].append(i_grain)
                 for grain2 in L_g_extract:
                     if i_grain in grain2.ig_near_L:
                         grain2.eta_near_L.append(etai)
             etai = etai + 1
-        if etai == len(L_etai) and not etai_defined:
+        if etai-etai_0 == len(L_etai) and not etai_defined:
             grain.id_eta = etai
             L_etai.append(etai)
             n_etai_L.append(1)
@@ -125,6 +128,7 @@ def etai_distribution(dict_algorithm, dict_sample, simulation_report, group):
             for grain2 in L_g_extract:
                 if i_grain in grain2.ig_near_L:
                     grain2.eta_near_L.append(etai)
+
     #adaptation (try to have the same number of grain assigned to all eta)
     n_etai_mean = np.mean(n_etai_L)
     #check the quality
@@ -136,11 +140,11 @@ def etai_distribution(dict_algorithm, dict_sample, simulation_report, group):
     while not adaptation_done :
         adaptation_i = adaptation_i + 1
         L_ig_over =  L_ig_etai[n_etai_L.index(max(n_etai_L))]
-        id_g_to_work = L_ig_over[random.randint(0,len(L_ig_over)-1)]
         i_etai_over = n_etai_L.index(max(n_etai_L))
         etai_over = L_etai[i_etai_over]
         i_etai_under = n_etai_L.index(min(n_etai_L))
         etai_under = L_etai[i_etai_under]
+        id_g_to_work = L_ig_over[random.randint(0,len(L_ig_over)-1)]
         grain = L_g_extract[id_g_to_work]
         if etai_under not in grain.eta_near_L:
             grain.id_eta = etai_under
@@ -163,12 +167,15 @@ def etai_distribution(dict_algorithm, dict_sample, simulation_report, group):
     #Create etai
     L_etai = []
     for i in range(len(L_ig_etai)) :
-        etai = Etai(len(dict_sample['L_etai'])+i, L_ig_etai[i], dict_sample['L_g'])
+        L_id_grain = []
+        for j in L_ig_etai[i]:
+            L_id_grain.append(L_g_extract[j].id)
+        etai = Etai(len(dict_sample['L_etai']) + i, L_id_grain, dict_sample['L_g'])
         L_etai.append(etai)
 
     #update the dict
     dict_sample['L_etai'] = dict_sample['L_etai'] + list(L_etai)
-    simulation_report.write_and_print(f"{len(dict_sample['L_etai'])} phase variables used for group "+group+".\n",f"{len(dict_sample['L_etai'])} phase variables used for group "+group+".")
+    simulation_report.write_and_print(f"{len(L_etai)} phase variables used for group "+group+".\n",f"{len(L_etai)} phase variables used for group "+group+".")
 
 #-------------------------------------------------------------------------------
 #Not used
