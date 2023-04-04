@@ -213,10 +213,18 @@ class Grain:
         '''
         #initilization
         self.etai_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+        bc_left = False
+        bc_right = False
 
         #extract a spatial zone
         x_min = min(self.l_border_x)-dict_material['w']
+        if x_min < dict_sample['x_box_min']:
+            bc_left = True
+            x_min = dict_sample['x_box_max'] - (dict_sample['x_box_min']-x_min)
         x_max = max(self.l_border_x)+dict_material['w']
+        if dict_sample['x_box_max'] < x_max :
+            bc_right = True
+            x_max = dict_sample['x_box_min'] + (x_max-dict_sample['x_box_max'])
         y_min = min(self.l_border_y)-dict_material['w']
         y_max = max(self.l_border_y)+dict_material['w']
 
@@ -233,21 +241,61 @@ class Grain:
         i_y_min = list(y_L_search_min).index(min(y_L_search_min))
         i_y_max = list(y_L_search_max).index(min(y_L_search_max))
 
-        for l in range(i_y_min,i_y_max+1):
-            for c in range(i_x_min,i_x_max+1):
-                y = dict_sample['y_L'][l]
-                x = dict_sample['x_L'][c]
-                p = np.array([x,y])
-                r = np.linalg.norm(self.center - p)
-                #look for the radius on this direction
-                if p[1]>self.center[1]:
-                    theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
-                else :
-                    theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
-                L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
-                R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
-                #build etai_M
-                self.etai_M[-1-l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
+        #no bc
+        if not bc_left and not bc_right :
+            for l in range(i_y_min,i_y_max+1):
+                for c in range(i_x_min,i_x_max+1):
+                    y = dict_sample['y_L'][l]
+                    x = dict_sample['x_L'][c]
+                    p = np.array([x,y])
+                    r = np.linalg.norm(self.center - p)
+                    #look for the radius on this direction
+                    if p[1]>self.center[1]:
+                        theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                    else :
+                        theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                    L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
+                    R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+                    #build etai_M
+                    self.etai_M[-1-l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
+        #bc left
+        elif bc_left and not bc_right :
+            for l in range(i_y_min,i_y_max+1):
+                for c in list(range(0,i_x_max+1))+list(range(i_x_min,len(dict_sample['x_L']))):
+                    y = dict_sample['y_L'][l]
+                    x = dict_sample['x_L'][c]
+                    if c in list(range(i_x_min,len(dict_sample['x_L']))):
+                        x = x - (dict_sample['x_box_max']-dict_sample['x_box_min'])
+                    p = np.array([x,y])
+                    r = np.linalg.norm(self.center - p)
+                    #look for the radius on this direction
+                    if p[1]>self.center[1]:
+                        theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                    else :
+                        theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                    L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
+                    R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+                    #build etai_M
+                    self.etai_M[-1-l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
+        #bc right
+        elif not bc_left and bc_right :
+            for l in range(i_y_min,i_y_max+1):
+                for c in list(range(0,i_x_max+1))+list(range(i_x_min,len(dict_sample['x_L']))):
+                    y = dict_sample['y_L'][l]
+                    x = dict_sample['x_L'][c]
+                    if c in list(range(0,i_x_max+1)):
+                        x = x + (dict_sample['x_box_max']-dict_sample['x_box_min'])
+                    p = np.array([x,y])
+                    r = np.linalg.norm(self.center - p)
+                    #look for the radius on this direction
+                    if p[1]>self.center[1]:
+                        theta = math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                    else :
+                        theta= 2*math.pi - math.acos((p[0]-self.center[0])/np.linalg.norm(self.center-p))
+                    L_theta_R_i = list(abs(np.array(self.l_theta_r)-theta))
+                    R = self.l_r[L_theta_R_i.index(min(L_theta_R_i))]
+                    #build etai_M
+                    self.etai_M[-1-l][c] = Owntools.Cosine_Profile(R,r,dict_material['w'])
 
 #-------------------------------------------------------------------------------
 
