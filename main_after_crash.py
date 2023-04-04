@@ -35,7 +35,7 @@ import Owntools.Save
 #User
 #-------------------------------------------------------------------------------
 
-name_to_load = 'Run_1_ic_save_dicts'
+name_to_load = 'Run_6_ic_save_dicts'
 
 #-------------------------------------------------------------------------------
 #load data
@@ -58,19 +58,23 @@ simulation_report = dict_save['report']
 
 simulation_report.write('\nA crash occurs...\n\n')
 
-#change parameters
-dict_algorithm['dy_top_max'] = dict_geometry['R_mean']*0.001
-dict_sollicitations['i_DEM_stop'] = 2000
-
 #-------------------------------------------------------------------------------
 #main
 #-------------------------------------------------------------------------------
 
 if name_to_load[-14:] =='_ic_save_dicts':
+    #create mesh
+    Owntools.create_mesh(dict_algorithm, dict_material, dict_sample)
+
+    #create etais
+    main.define_etai(dict_algorithm, dict_material, dict_sample, simulation_report)
+
+    #add solute
+    User.generate_solute(dict_sample)
+
+    #load
     dict_tracker = {}
-    
-    main.load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
-    raise ValueError('stop')
-    
-    main.shear_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
-    main.close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    main.shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+
+    #close simulation
+    main.close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
