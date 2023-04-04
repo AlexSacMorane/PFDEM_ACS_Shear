@@ -146,7 +146,7 @@ def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
             i_bottom = i_bottom + 1
         elif grain.is_group(dict_sample['y_box_max'] - dict_algorithm['top_height'], dict_sample['y_box_max'], 'Top') :
             i_top = i_top + 1
-    simulation_report.write_and_print('\nDefine groups\n','\nDefine groups')
+    simulation_report.write_and_print('Define groups\n','Define groups')
     simulation_report.write_and_print(str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n\n', str(i_bottom)+' grains in Bottom group\n'+str(i_top)+' grains in Top group\n')
 
     #delete contact gw
@@ -198,7 +198,7 @@ def from_ic_to_real(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_
         Output :
             Nothing, but dictionnaries are updated
     """
-    simulation_report.write_and_print('Convert initial configuration to current one\n\n', '\nConvert initial configuration to current one\n')
+    simulation_report.write_and_print('Convert initial configuration to current one\n\n', 'Convert initial configuration to current one\n')
     Owntools.convert_ic_to_real(dict_ic, dict_sample)
     #save
     Owntools.Save.save_dicts_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
@@ -277,7 +277,7 @@ def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict
 
 #-------------------------------------------------------------------------------
 
-def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report):
+def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report):
     '''
     Close the simulation.
 
@@ -288,6 +288,7 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
             a material dictionnary (a dict)
             a sample dictionnary (a dict)
             a sollicitations dictionnary (a dict)
+            a tracker dictionnary (a dict)
             a simulation report (a report)
         Output :
             Nothing, but dictionnaries are updated
@@ -307,6 +308,7 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
         name_actual_folder = os.path.dirname(os.path.realpath(__file__))
         shutil.copytree(name_actual_folder, '../'+dict_algorithm['main_folder_name']+'/'+dict_algorithm['name_folder'])
         os.remove(dict_algorithm['name_folder']+'_save_dicts')
+        os.remove(dict_algorithm['name_folder']+'_ic_save_dicts')
 
 #-------------------------------------------------------------------------------
 #main
@@ -327,12 +329,15 @@ if '__main__' == __name__:
     #create mesh
     Owntools.create_mesh(dict_algorithm, dict_material, dict_sample)
 
-    #reate etais
+    #create etais
     define_etai(dict_algorithm, dict_material, dict_sample, simulation_report)
+
+    #add solute
+    User.generate_solute(dict_sample)
 
     #load
     dict_tracker = {}
     shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
 
-    #cose simulation
-    close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
+    #close simulation
+    close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
