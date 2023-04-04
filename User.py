@@ -35,7 +35,7 @@ def All_parameters():
     #Geometric parameters
 
     #Total number of grains
-    N_grain = 40
+    N_grain = 35
     #Disk
     R_mean = 250 #µm radius to compute the grain distribution. Then recomputed
     L_R = [R_mean] #from larger to smaller
@@ -87,7 +87,7 @@ def All_parameters():
     #Sample definition
 
     #Box définition
-    H_L_ratio = (5/6)
+    H_L_ratio = (5/7)
     x_box_min = 0 #µm
     x_box_max = 2*R_mean*math.sqrt(N_grain/H_L_ratio) #µm
     y_box_min = 0 #µm
@@ -106,15 +106,24 @@ def All_parameters():
     dt_PF = 0.01 #s time step during MOOSE simulation
     n_t_PF = 10 #number of iterations PF
     factor_distribution_etai = 1.6 #margin to distribute etai
-    n_local = 40 #estimation number of node in one axis for a grain
+    n_local = 60 #estimation number of node in one axis for a grain
     n_x = int(n_local * (x_box_max-x_box_min)/(2*R_mean)) #number of nodes in x-axis
     n_y = int(n_local * H_L_ratio*(x_box_max-x_box_min)/(2*R_mean)) #number of nodes in y-axis
+
+    #Number of processor
+    np_proc = 4
+
+    #structural matrix to build diffusion map and available node map
+    struct_element = np.array(np.ones((int(n_local/20), int(n_local/20))))
+
+    #update solute map
+    i_update_solute = 50
 
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
     dt_DEM = dt_DEM_crit/6 #s time step during DEM simulation
-    factor_neighborhood = 1.5 #margin to detect a grain into a neighborhood
-    i_update_neighborhoods = 10 #the frequency of the update of the neighborhood of the grains and the walls
+    factor_neighborhood = 1 #margin to detect a grain into a neighborhood
+    i_update_neighborhoods = 1 #the frequency of the update of the neighborhood of the grains and the walls
 
     #Groups definition
     bottom_height = 1.5*R_mean #bottom group
@@ -126,9 +135,6 @@ def All_parameters():
     #PID corrector to apply confinement force on Top group (used in IC generation)
     PID_kp = 10**(-7) #proportionnal to the error
     dy_top_max = R_mean*0.001 #limit the displacement of the top group
-
-    #Number of processor
-    np_proc = 4
 
     #Debug
     Debug = True #plot configuration before and after DEM simulation
@@ -146,6 +152,9 @@ def All_parameters():
     'factor_distribution_etai' : factor_distribution_etai,
     'n_x' : n_x,
     'n_y' : n_y,
+    'np_proc' : np_proc,
+    'struct_element' : struct_element,
+    'i_update_solute' : i_update_solute,
     'dt_DEM_crit' : dt_DEM_crit,
     'dt_DEM' : dt_DEM,
     'factor_neighborhood' : factor_neighborhood,
@@ -155,7 +164,6 @@ def All_parameters():
     'd_to_image' : d_to_image,
     'kp' : PID_kp,
     'dy_top_max' : dy_top_max,
-    'np_proc' : np_proc,
     'Debug' : Debug,
     'Debug_DEM' : Debug_DEM,
     'i_print_plot' : i_print_plot,
