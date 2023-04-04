@@ -13,7 +13,6 @@ This is the file to restart a simulation after a crash.
 import os
 import pickle
 import shutil
-from datetime import datetime
 from pathlib import Path
 
 #Own function and class
