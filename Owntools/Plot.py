@@ -55,7 +55,7 @@ def Plot_mesh(dict_sample):
         Output :
             Nothing, but a .png file is generated (a file)
     """
-    L_color_group = ['k','r','b']
+    L_color_group = ['y','r','b']
     L_group = ['Current', 'Bottom', 'Top']
     fig = plt.figure(1,figsize=(16,9.12))
     #x-axis
