@@ -86,7 +86,7 @@ def Plot_etais(dict_sample):
     """
     fig = plt.figure(1,figsize=(16,9.12))
 
-    L_color = ['red', 'royalblue', 'forestgreen', 'gold', 'hotpink', 'skyblue', 'chocolate', 'darkkhaki', 'darkorchid', 'silver']
+    L_color = ['red', 'royalblue', 'forestgreen', 'gold', 'hotpink', 'skyblue', 'chocolate', 'darkkhaki', 'darkorchid', 'silver', 'tan',  'yellowgreen', 'crimson']
     #etas
     etas_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
     for etai in dict_sample['L_etai']:
