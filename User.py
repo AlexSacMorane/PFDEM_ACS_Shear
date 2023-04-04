@@ -233,3 +233,27 @@ def All_parameters():
     #---------------------------------------------------------------------------
 
     return dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations
+
+#-------------------------------------------------------------------------------
+
+def generate_solute(dict_sample):
+    """
+    Generate some solute in the sample.
+
+        Input :
+            a sample dictionnary (a dict)
+        Output :
+            Nothing, but the sample dictionnary gets a solute concentration map (a nx x ny numpy array)
+    """
+    dict_sample['solute_M'] = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+    for l in range(len(dict_sample['y_L'])):
+        for c in range(len(dict_sample['x_L'])):
+            #detect contact area with 2 etais > 0.5
+            n_etais = 0
+            for etai in dict_sample['L_etai']:
+                if etai.etai_M[l][c] > 0.5:
+                    n_etais = n_etais + 1
+            if n_etais >= 2:
+                dict_sample['solute_M'][l][c] = 0.1 #input
+
+#-------------------------------------------------------------------------------
