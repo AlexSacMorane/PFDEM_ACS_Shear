@@ -12,7 +12,6 @@ This is the main file.
 
 import os
 import shutil
-from datetime import datetime
 from pathlib import Path
 
 #Own function and class
@@ -68,7 +67,7 @@ def plan_simulation():
             os.mkdir('Debug/Init_polygons_group')
 
     #report
-    simulation_report = Report.Report('Debug/Report.txt',datetime.now())
+    simulation_report = Report.Report('Debug/Report.txt')
 
     #find name
     if dict_algorithm['SaveData'] :
@@ -107,21 +106,21 @@ def generate_ic(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_samp
             Nothing, but dictionnaries are updated
     """
     #generate and load disks
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     Create_IC.LG_tempo(dict_algorithm, dict_geometry, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
-    simulation_report.tac_tempo(datetime.now(), 'Loading with disks')
+    simulation_report.tac_tempo('Loading with disks')
 
     #discretization
     simulation_report.write_and_print('Discretize the sample\n', 'Discretize the sample\n')
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     dict_ic = Create_IC_Polygonal.Discretize_Grains(dict_ic, dict_geometry['discretization']) #overwrite sphere dict_ic
-    simulation_report.tac_tempo(datetime.now(), 'From disks to polygons')
+    simulation_report.tac_tempo('From disks to polygons')
 
     #load discrete grains
     print('Load with top plate')
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     Create_IC_Polygonal.DEM_loading(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
-    simulation_report.tac_tempo(datetime.now(), 'Loading with polygons')
+    simulation_report.tac_tempo('Loading with polygons')
 
 #-------------------------------------------------------------------------------
 
@@ -138,7 +137,7 @@ def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
             Nothing, but dictionnaries are updated
     """
     #define packs
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     i_bottom = 0
     i_top = 0
     for grain in dict_ic['L_g_tempo'] :
@@ -156,7 +155,7 @@ def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
     #plot group distribution
     if dict_algorithm['Debug']:
         Owntools.Plot.Plot_group_distribution(dict_ic)
-        simulation_report.tac_tempo(datetime.now(), 'Define groups')
+        simulation_report.tac_tempo( 'Define groups')
 
 #-------------------------------------------------------------------------------
 
@@ -178,9 +177,9 @@ def load_ic_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_soll
     """
     #load discrete grains
     print('Load with top group')
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     Create_IC_Polygonal.DEM_loading_group(dict_algorithm, dict_ic, dict_material, dict_sample, dict_sollicitations, simulation_report)
-    simulation_report.tac_tempo(datetime.now(), 'Loading with polygons with groups')
+    simulation_report.tac_tempo('Loading with polygons with groups')
 
 #-------------------------------------------------------------------------------
 
@@ -222,9 +221,9 @@ def load_sample(dict_algorithm, dict_material, dict_sample, dict_sollicitations,
     '''
     #shear sample
     simulation_report.write_and_print('\nConfine the sample\n', 'Confine the sample')
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     Confine_Polygonal.DEM_confine_load(dict_algorithm, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
-    simulation_report.tac_tempo(datetime.now(), 'Confinement')
+    simulation_report.tac_tempo('Confinement')
 
 #-------------------------------------------------------------------------------
 
@@ -241,7 +240,7 @@ def define_etai(dict_algorithm, dict_material, dict_sample, simulation_report):
             Nothing, but sample dictionnary is updated with etais
     '''
     simulation_report.write_and_print('\nDefining the etais\n', 'Defining the etais')
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     #build phase field for grains
     for grain in dict_sample['L_g']:
         grain.build_etai_M(dict_material,dict_sample)
@@ -252,7 +251,7 @@ def define_etai(dict_algorithm, dict_material, dict_sample, simulation_report):
     if dict_algorithm['Debug']:
         Owntools.Plot.Plot_etais(dict_sample)
     simulation_report.write_and_print(f"{round(len(dict_sample['L_g'])/len(dict_sample['L_etai']),1)} grains in average per etai.\n\n", f"{round(len(dict_sample['L_g'])/len(dict_sample['L_etai']),1)} grains in average per etai.\n")
-    simulation_report.tac_tempo(datetime.now(), 'Defining the etais')
+    simulation_report.tac_tempo('Defining the etais')
 
 #-------------------------------------------------------------------------------
 
@@ -273,9 +272,9 @@ def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict
     '''
     #shear sample
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
-    simulation_report.tic_tempo(datetime.now())
+    simulation_report.tic_tempo()
     Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
-    simulation_report.tac_tempo(datetime.now(), 'Shearing')
+    simulation_report.tac_tempo('Shearing')
 
 #-------------------------------------------------------------------------------
 
@@ -299,7 +298,7 @@ def close_simulation(dict_algorithm, dict_geometry, dict_ic, dict_material, dict
     if dict_algorithm['Debug_DEM'] :
         Owntools.Plot.Plot_mp4('Debug/Shear/Config_','Debug/Shear/Configuration.mp4')
 
-    simulation_report.end(datetime.now())
+    simulation_report.end()
 
     #if dict_algorithm['cleanData'] :
     #    pass
