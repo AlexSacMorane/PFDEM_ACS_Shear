@@ -12,6 +12,7 @@ This report is a .txt file with information from the simulation
 
 import os
 import time
+from datetime import datetime
 
 #-------------------------------------------------------------------------------
 #Class
@@ -21,13 +22,12 @@ class Report:
 
 #-------------------------------------------------------------------------------
 
-    def __init__(self, Name, Datetime):
+    def __init__(self, Name):
         """
         Defining a report
 
             Input :
                 a name (a string)
-                a time (a datetime)
             Output :
                 Nothing, but a .txt file and a report are generated (a file and a report)
         """
@@ -35,7 +35,7 @@ class Report:
             if Name[-4:] != '.txt':
                 Name = Name + '.txt'
             self.name = Name
-            self.datetimestart = str(Datetime)
+            self.datetimestart = str(datetime.now())
 
             Last_modification = 0
             L_file = os.listdir()
@@ -46,7 +46,7 @@ class Report:
 
             file_to_write = open(self.name,'w')
             file_to_write.write('Last compilation: '+str(time.ctime(Last_modification))+'\n')
-            file_to_write.write('Simulation started '+str(Datetime)[:19]+'\n\n')
+            file_to_write.write('Simulation started '+str(datetime.now())[:19]+'\n\n')
             file_to_write.close()
         else:
             print('Error')
@@ -88,32 +88,30 @@ class Report:
 
 #-------------------------------------------------------------------------------
 
-    def tic_tempo(self, Datetime):
+    def tic_tempo(self):
         """
         Save a temporary start time.
         It works with tac_tempo() to compute a time cost for a simulation step.
 
             Input :
                 itself (a report)
-                a time (a datetime)
             Output :
                 Nothing, but the report gets a new attribut (a datetime)
         """
-        self.datetimestart_tempo = str(Datetime)
+        self.datetimestart_tempo = str(datetime.now())
 
 #-------------------------------------------------------------------------------
 
-    def tac_tempo(self, Datetime, Step_name):
+    def tac_tempo(self, Step_name):
         """
         Work with tic_tempo() to compute a time cost for a simulation step.
 
             Input :
                 itself (a report)
-                a time (adatetime)
             Output :
                 Nothing, but the .txt file is updated
         """
-        self.datetimeend_tempo = str(Datetime)
+        self.datetimeend_tempo = str(datetime.now())
 
         dyear = int(self.datetimeend_tempo[:4])-int(self.datetimestart_tempo[:4])
         dmonth = int(self.datetimeend_tempo[5:7])-int(self.datetimestart_tempo[5:7])
@@ -139,17 +137,66 @@ class Report:
 
 #-------------------------------------------------------------------------------
 
-    def end(self, Datetime):
+    def tic_2nd_tempo(self):
+        """
+        Save a temporary start time.
+        It works with tac_2nd_tempo() to compute a time cost for a simulation step.
+        Can work inside a tic tac time compute.
+
+            Input :
+                itself (a report)
+            Output :
+                Nothing, but the report gets a new attribut (a datetime)
+        """
+        self.datetimestart_2nd_tempo = str(datetime.now())
+
+#-------------------------------------------------------------------------------
+
+    def tac_2nd_tempo(self, Step_name):
+        """
+        Work with tic_2nd_tempo() to compute a time cost for a simulation step.
+
+            Input :
+                itself (a report)
+            Output :
+                Nothing, but the .txt file is updated
+        """
+        self.datetimeend_2nd_tempo = str(datetime.now())
+
+        dyear = int(self.datetimeend_2nd_tempo[:4])-int(self.datetimestart_2nd_tempo[:4])
+        dmonth = int(self.datetimeend_2nd_tempo[5:7])-int(self.datetimestart_2nd_tempo[5:7])
+        dday = int(self.datetimeend_2nd_tempo[8:10])-int(self.datetimestart_2nd_tempo[8:10])
+        dhour = int(self.datetimeend_2nd_tempo[11:13])-int(self.datetimestart_2nd_tempo[11:13])
+        dmin = int(self.datetimeend_2nd_tempo[14:16])-int(self.datetimestart_2nd_tempo[14:16])
+        dsec = int(self.datetimeend_2nd_tempo[17:19])-int(self.datetimestart_2nd_tempo[17:19])
+
+        dt = dsec + dmin*60 + dhour*60*60 + dday*60*60*24 + dmonth*60*60*24*30.5 + dyear*60*60*24*30.5*365.25 #in sec
+
+        dt_day = dt // (60*60*24) #in dday
+        dt = dt % (60*60*24)
+        dt_hour = dt // (60*60) #in hour
+        dt = dt % (60*60)
+        dt_min = dt // 60 # in min
+        dt = dt % 60
+
+        file_to_write = open(self.name,'a')
+        file_to_write.write('Time spent during "'+Step_name+'" : '+str(dt_day)+' days '+str(dt_hour)+' hours '+str(dt_min)+' min '+str(dt)+' sec\n')
+        file_to_write.close()
+
+        print('Time spent during "'+Step_name+'" : '+str(dt_day)+' days '+str(dt_hour)+' hours '+str(dt_min)+' min '+str(dt)+' sec')
+
+#-------------------------------------------------------------------------------
+
+    def end(self):
      """
      Work with init() to compute the total time cost of the simulation.
 
         Input :
             itself (a report)
-            a time (a datetime)
         Output :
             Nothing, but the .txt file is updated
      """
-     self.datetimeend = str(Datetime)
+     self.datetimeend = str(datetime.now())
 
      dyear = int(self.datetimeend[:4])-int(self.datetimestart[:4])
      dmonth = int(self.datetimeend[5:7])-int(self.datetimestart[5:7])
@@ -168,7 +215,7 @@ class Report:
      dt = dt % 60
 
      file_to_write = open(self.name,'a')
-     file_to_write.write('\n'+'Simulation ended '+str(Datetime)[:19]+'\n')
+     file_to_write.write('\n'+'Simulation ended '+str(datetime.now())[:19]+'\n')
      file_to_write.write('Time spent : '+str(dt_day)+' days '+str(dt_hour)+' hours '+str(dt_min)+' min '+str(dt)+' sec\n')
      file_to_write.close()
 
