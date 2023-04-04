@@ -210,18 +210,17 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
 
         #move solute out of grains
         if dict_algorithm['i_DEM'] % dict_algorithm['i_update_solute'] == 0:
+            #add move pf dict_algorithm (put some frenquency)
+            #be carefull of the periodic bc
             Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
+
+        #add pf simulation (new module) and pf->DEM and DEM->PF
 
         #debug print and plot
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
             print('i_DEM',dict_algorithm['i_DEM'],': Confinement',int(100*Fv/dict_sollicitations['Vertical_Confinement_Force']),'% Shear',round(Shear_strain,4),'('+str(int(100*Shear_strain/dict_sollicitations['Shear_strain_target']))+' %)')
             if dict_algorithm['Debug_DEM'] :
                 Owntools.Plot.Plot_Config_Sheared(dict_sample,dict_algorithm['i_DEM']) #change function here
-
-        #add move pf dict_algorithm (put some frenquency)
-        #be carefull of the periodic bc
-
-        #add pf simulation (new module) and pf->DEM and DEM->PF
 
         #Check stop conditions for DEM
         if Shear_strain >= dict_sollicitations['Shear_strain_target'] : #strain target reached
@@ -270,115 +269,3 @@ def Control_Top_PID(dict_algorithm, Force_target, L_g):
         dy_top = np.sign(dy_top)*dict_algorithm['dy_top_max']
 
     return dy_top, F
-
-#-------------------------------------------------------------------------------
-#Not used
-#-------------------------------------------------------------------------------
-
-def Control_Top_NR(Force_target,L_contact_gg,L_g):
-    """
-    Control the upper wall to apply force.
-
-    A Newton-Raphson method is applied to verify the confinement.
-        Input :
-            a confinement value (a float)
-            a list of contact grain - grain and grain - image (a list)
-            a list of grain (a list)
-        Output :
-            the displacement of the top group (a float)
-            a force applied on the top group before control (a float)
-    """
-    F = 0
-    overlap_L = []
-    k_L = []
-    for contact in L_contact_gg:
-        #compute force applied, save contact overlap and spring
-        #only the normal component is considered, no tangential one, no damping
-        if (contact.g1.group == 'Current' and contact.g2.group == 'Top') :
-            F = F - contact.F_2_1_n * contact.pc_normal[1] #- because F_2_1_n < 0
-            overlap_L.append(contact.overlap_normal)
-            k_L.append(contact.k*contact.pc_normal[1])
-        elif (contact.g1.group == 'Top' and contact.g2.group == 'Current') :
-            F = F + contact.F_2_1_n * contact.pc_normal[1] #+ because F_2_1_n < 0 and pc_normal from top to current
-            overlap_L.append(contact.overlap_normal)
-            k_L.append(-contact.k*contact.pc_normal[1]) #because pc_normal from top to current
-
-    if overlap_L != []:
-        i_NR = 0
-        dy_top = 0
-        ite_criteria = True
-        #control the upper wall
-        if -0.01*Force_target<error_on_ymax_f(dy_top,overlap_L,k_L,Force_target) and error_on_ymax_f(dy_top,overlap_L,k_L,Force_target)<0.01*Force_target:
-            ite_criteria = False
-        while ite_criteria :
-            i_NR = i_NR + 1
-            dy_top = dy_top - error_on_ymax_f(dy_top,overlap_L,k_L,Force_target)/error_on_ymax_df(dy_top,overlap_L,k_L)
-            if i_NR > 100: #Maximum try
-                ite_criteria = False
-            if -0.01*Force_target<error_on_ymax_f(dy_top,overlap_L,k_L,Force_target) and error_on_ymax_f(dy_top,overlap_L,k_L,Force_target)<0.01*Force_target:
-                ite_criteria = False
-
-    else :
-        #if there is no contact with the upper wall, the wall is reset
-        dy_top = Reset_y_max(L_g)
-
-    return dy_top, F
-
-#-------------------------------------------------------------------------------
-
-def error_on_ymax_f(dy,overlap_L,k_L,Force_target) :
-    """
-    Compute the function f to control the upper wall. It is the difference between the force applied and the target value.
-
-        Input :
-            an increment of the upper wall position (a float)
-            a list of overlap for contact between temporary grain and upper wall (a list)
-            a list of spring for contact between temporary grain and upper wall (a list)
-            a confinement force (a float)
-        Output :
-            the difference between the force applied and the confinement (a float)
-    """
-    f = Force_target
-    for i in range(len(overlap_L)):
-        f = f - k_L[i]*(max(overlap_L[i]-dy,0))**(3/2)
-    return f
-
-#-------------------------------------------------------------------------------
-
-def error_on_ymax_df(dy,overlap_L,k_L) :
-    """
-    Compute the derivative function df to control the upper wall (error_on_ymax_f()).
-
-        Input :
-            an increment of the upper wall position (a float)
-            a list of overlap for contact between temporary grain and upper wall (a list)
-            a list of spring for contact between temporary grain and upper wall (a list)
-        Output :
-            the derivative of error_on_ymax_f() (a float)
-    """
-    df = 0
-    for i in range(len(overlap_L)):
-        df = df + 3/2*k_L[i]*(max(overlap_L[i]-dy,0))**(1/2)
-    return df
-
-#-------------------------------------------------------------------------------
-
-def Reset_y_max(L_g):
-    """
-    The Top group is going down by a fraction of the mean radius.
-
-    The confinement force is not verified.
-
-        Input :
-            the list of temporary grains (a list)
-        Output :
-            the upper wall position (a float)
-    """
-    R_mean = 0
-    n_grain = 0
-    for grain in L_g :
-        if grain.group == 'Top' :
-            R_mean = R_mean + grain.radius
-            n_grain = n_grain + 1
-    dy_top = - R_mean / n_grain / 20
-    return dy_top
