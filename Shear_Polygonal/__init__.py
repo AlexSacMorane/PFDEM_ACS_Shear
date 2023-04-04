@@ -205,25 +205,23 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
         dict_tracker['compacity_L'].append(Surface_g/((dict_sample['y_box_max']-dict_sample['y_box_min'])*(dict_sample['x_box_max']-dict_sample['x_box_min'])))
         dict_tracker['vertical_force_before_L'].append(sum_fy_top)
         dict_tracker['vertical_force_after_L'].append(Fv)
-        #dict_tracker['n_iteration_control_y_max_L'].append(n_iteration)
         dict_tracker['dy_top_L'].append(dy_top)
         dict_tracker['mu_sample_L'].append(mu_sample)
 
+        #move solute out of grains
+        if dict_algorithm['i_DEM'] % dict_algorithm['i_update_solute'] == 0:
+            Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
+
+        #debug print and plot
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
             print('i_DEM',dict_algorithm['i_DEM'],': Confinement',int(100*Fv/dict_sollicitations['Vertical_Confinement_Force']),'% Shear',round(Shear_strain,4),'('+str(int(100*Shear_strain/dict_sollicitations['Shear_strain_target']))+' %)')
             if dict_algorithm['Debug_DEM'] :
                 Owntools.Plot.Plot_Config_Sheared(dict_sample,dict_algorithm['i_DEM']) #change function here
-                #Owntools.Plot.Plot_Contact(dict_sample,dict_algorithm['i_DEM'])
 
         #add move pf dict_algorithm (put some frenquency)
         #be carefull of the periodic bc
 
         #add pf simulation (new module) and pf->DEM and DEM->PF
-
-        if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
-            if dict_algorithm['Debug_DEM'] :
-                #add plot
-                pass
 
         #Check stop conditions for DEM
         if Shear_strain >= dict_sollicitations['Shear_strain_target'] : #strain target reached
