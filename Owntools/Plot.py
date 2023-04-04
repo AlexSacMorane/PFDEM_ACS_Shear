@@ -117,7 +117,11 @@ def Plot_Config_Sheared(dict_sample,i):
     """
     L_color_group = ['k','r','b']
     L_group = ['Current', 'Bottom', 'Top']
+    L_color = ['red', 'royalblue', 'forestgreen', 'gold', 'hotpink', 'skyblue', 'chocolate', 'darkkhaki', 'darkorchid', 'silver', 'tan',  'yellowgreen', 'crimson']
+
     plt.figure(1,figsize=(16,9))
+
+    plt.subplot(211)
     #solute
     im = plt.imshow(dict_sample['solute_M'], interpolation='nearest', extent=[min(dict_sample['x_L']),max(dict_sample['x_L']), min(dict_sample['y_L']),max(dict_sample['y_L'])], vmin = 0, vmax = 0.1)
     plt.colorbar(im)
@@ -132,6 +136,20 @@ def Plot_Config_Sheared(dict_sample,i):
                 plt.plot(grain.l_border_x,grain.l_border_y,'-.', color = L_color_group[i_group])
     plt.title('Solute and grains')
     plt.axis('equal')
+
+    plt.subplot(212)
+    #etas
+    etas_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+    for etai in dict_sample['L_etai']:
+        etas_M = etas_M + etai.etai_M
+    im = plt.imshow(etas_M, interpolation='nearest', extent=[min(dict_sample['x_L']),max(dict_sample['x_L']), min(dict_sample['y_L']),max(dict_sample['y_L'])], vmin = 0, vmax = 1)
+    plt.colorbar(im)
+    #grains
+    for grain in dict_sample['L_g']:
+        plt.plot(grain.l_border_x,grain.l_border_y,color=L_color[grain.etai],linewidth=3)
+    plt.title('Phase field and grains')
+    plt.axis('equal')
+
     plt.savefig('Debug/Shear/Config_'+str(i)+'.png')
     plt.close(1)
 
