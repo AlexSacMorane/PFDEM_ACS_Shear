@@ -58,9 +58,13 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
     simulation_report.write_and_print('Inertial number : '+str(dict_sample['I_number'])+'\n','Inertial number : '+str(dict_sample['I_number']))
     #must be under 10-3 to consider critical state
     simulation_report.write_and_print('Expected number of iterations : '+str(int(dict_sollicitations['Shear_strain_target']*Sample_height/(dict_sollicitations['Shear_velocity']*dict_algorithm['dt_DEM'])))+'\n\n','Expected number of iterations : '+str(int(dict_sollicitations['Shear_strain_target']*Sample_height/(dict_sollicitations['Shear_velocity']*dict_algorithm['dt_DEM'])))+'\n')
-
-    #track total displacement of grains
+    #Switch on tracks
     for grain in dict_sample['L_g'] :
+        #track rigid body motion to move pf
+        grain.track_rbm_pf_interpolation = True
+        grain.u_pf_interpolation = np.array([0,0])
+        grain.dtheta_pf_interpolation = 0
+        #track total displacement of grains (plot)
         grain.track_u = True
         grain.total_ux = 0
         grain.total_uy = 0
@@ -149,9 +153,6 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
             if grain.group == 'Current' :
                 grain.euler_semi_implicite(dict_algorithm['dt_DEM'])
 
-        #Add solute move algorithm (put some frenquency)
-        #be carefull of the top and bottom group / pericodic condition
-
         #periodic condition
         for grain in dict_sample['L_g']:
             #left wall
@@ -209,10 +210,19 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
         dict_tracker['mu_sample_L'].append(mu_sample)
 
         #move solute out of grains
-        if dict_algorithm['i_DEM'] % dict_algorithm['i_update_solute'] == 0:
-            #add move pf dict_algorithm (put some frenquency)
-            #be carefull of the periodic bc
+        if dict_algorithm['i_DEM'] % dict_algorithm['i_update_pf_solute'] == 0:
+            #move pf
+            simulation_report.tic_2nd_tempo()
+            for i_grain in range(len(dict_sample['L_g'])) :
+                #add bc
+                dict_sample['L_g'][i_grain].move_grain_interpolation(dict_material, dict_sample)
+                dict_sample['L_g'][i_grain].u_pf_interpolation = np.array([0,0])
+                dict_sample['L_g'][i_grain].dtheta_pf_interpolation = 0
+            simulation_report.tac_2nd_tempo('Update phase fields')
+            simulation_report.tic_2nd_tempo()
+            #move solute
             Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
+            simulation_report.tac_2nd_tempo('Update solute')
 
         #add pf simulation (new module) and pf->DEM and DEM->PF
 
