@@ -218,6 +218,7 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
                 dict_sample['L_g'][i_grain].move_grain_interpolation(dict_material, dict_sample)
                 dict_sample['L_g'][i_grain].u_pf_interpolation = np.array([0,0])
                 dict_sample['L_g'][i_grain].dtheta_pf_interpolation = 0
+            #update map of etai
             simulation_report.tac_2nd_tempo('Update phase fields')
             simulation_report.tic_2nd_tempo()
             #move solute
