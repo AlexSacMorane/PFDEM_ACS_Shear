@@ -155,7 +155,7 @@ def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
     #plot group distribution
     if dict_algorithm['Debug']:
         Owntools.Plot.Plot_group_distribution(dict_ic)
-        simulation_report.tac_tempo( 'Define groups')
+        simulation_report.tac_tempo('Define groups')
 
 #-------------------------------------------------------------------------------
 
