@@ -154,8 +154,9 @@ def define_group(dict_algorithm, dict_ic, dict_sample, simulation_report):
     dict_ic['L_contact_gw_ij'] = []
 
     #plot group distribution
-    Owntools.Plot.Plot_group_distribution(dict_ic)
-    simulation_report.tac_tempo(datetime.now(), 'Define groups')
+    if dict_algorithm['Debug']:
+        Owntools.Plot.Plot_group_distribution(dict_ic)
+        simulation_report.tac_tempo(datetime.now(), 'Define groups')
 
 #-------------------------------------------------------------------------------
 
@@ -250,6 +251,7 @@ def define_etai(dict_algorithm, dict_material, dict_sample, simulation_report):
         Etai.etai_distribution(dict_algorithm, dict_sample, simulation_report, group)
     if dict_algorithm['Debug']:
         Owntools.Plot.Plot_etais(dict_sample)
+    simulation_report.write_and_print(f"{round(len(dict_sample['L_g'])/len(dict_sample['L_etai']),1)} grains in average per etai.\n\n", f"{round(len(dict_sample['L_g'])/len(dict_sample['L_etai']),1)} grains in average per etai.\n")
     simulation_report.tac_tempo(datetime.now(), 'Defining the etais')
 
 #-------------------------------------------------------------------------------
