@@ -12,6 +12,7 @@ This file contains the different functions used in the simulation.
 
 from pathlib import Path
 import matplotlib.pyplot as plt
+import numpy as np
 import imageio
 
 #Own
