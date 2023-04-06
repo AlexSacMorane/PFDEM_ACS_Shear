@@ -130,6 +130,7 @@ def Plot_Config_Sheared(dict_sample,i):
         for i_group in range(len(L_group)):
             if grain.group == L_group[i_group] :
                 plt.plot(grain.l_border_x,grain.l_border_y,L_color_group[i_group])
+                plt.plot([grain.center[0], grain.l_border_x[0]],[grain.center[1], grain.l_border_y[0]],L_color_group[i_group])
     for grain in dict_sample['L_g_image']:
         for i_group in range(len(L_group)):
             if grain.group == L_group[i_group]:
