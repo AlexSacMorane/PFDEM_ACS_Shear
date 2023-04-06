@@ -215,12 +215,12 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
             simulation_report.tic_2nd_tempo()
             for i_grain in range(len(dict_sample['L_g'])) :
                 #add bc
-                dict_sample['L_g'][i_grain].move_grain_interpolation(dict_material, dict_sample)
+                dict_sample['L_g'][i_grain].move_grain_interpolation(dict_algorithm, dict_material, dict_sample)
                 dict_sample['L_g'][i_grain].u_pf_interpolation = np.array([0,0])
                 dict_sample['L_g'][i_grain].dtheta_pf_interpolation = 0
             #update etai
             for etai in dict_sample['L_etai']:
-                etai.update_etai_M[dict_sample['L_g']]
+                etai.update_etai_M(dict_sample['L_g'])
             simulation_report.tac_2nd_tempo('Update phase fields')
             #move solute
             Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
