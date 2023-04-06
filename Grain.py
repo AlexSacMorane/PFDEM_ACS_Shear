@@ -421,7 +421,14 @@ class Grain:
                 #interpolation of p
                 q = (q12*(p[1]-p34[1]) + q34*(p12[1]-p[1]))/(p12[1]-p34[1])
                 #update etai_M
-                etai_M_extended[-1-l][c] = q
+                if c <= len(dict_sample['x_L'])-i_bc_left-1:
+                    etai_M_extended[-1-l][c] = q
+                    etai_M_extended[-1-l][c+len(dict_sample['x_L'])-1] = q
+                elif 2*len(dict_sample['x_L'])-i_bc_left-1 <= c:
+                    etai_M_extended[-1-l][c] = q
+                    etai_M_extended[-1-l][c-len(dict_sample['x_L'])+1] = q
+                else :
+                    etai_M_extended[-1-l][c] = q
 
     #reinitialization
     etai_M_extended_copy = etai_M_extended.copy()
@@ -488,7 +495,14 @@ class Grain:
                 #interpolation of p
                 q = (q12*(p[1]-p34[1]) + q34*(p12[1]-p[1]))/(p12[1]-p34[1])
                 #update etai_M
-                etai_M_extended[-1-l][c] = q
+                if c <= len(dict_sample['x_L'])-i_bc_left-1:
+                    etai_M_extended[-1-l][c] = q
+                    etai_M_extended[-1-l][c+len(dict_sample['x_L'])-1] = q
+                elif 2*len(dict_sample['x_L'])-i_bc_left-1 <= c:
+                    etai_M_extended[-1-l][c] = q
+                    etai_M_extended[-1-l][c-len(dict_sample['x_L'])+1] = q
+                else :
+                    etai_M_extended[-1-l][c] = q
 
     self.etai_M = etai_M_extended[:,len(dict_sample['x_L'])-i_bc_left-1:2*len(dict_sample['x_L'])-i_bc_left-1].copy()
 
