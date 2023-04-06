@@ -274,6 +274,7 @@ def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo()
     Shear_Polygonal.DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, dict_sollicitations, dict_tracker, simulation_report)
+    simulation_report.write_and_print('\n','')
     simulation_report.tac_tempo('Shearing')
 
 #-------------------------------------------------------------------------------
