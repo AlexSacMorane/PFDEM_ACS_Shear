@@ -252,6 +252,10 @@ def define_etai(dict_algorithm, dict_material, dict_sample, simulation_report):
         Owntools.Plot.Plot_etais(dict_sample)
     simulation_report.write_and_print(f"{round(len(dict_sample['L_g'])/len(dict_sample['L_etai']),1)} grains in average per etai.\n\n", f"{round(len(dict_sample['L_g'])/len(dict_sample['L_etai']),1)} grains in average per etai.\n")
     simulation_report.tac_tempo('Defining the etais')
+    #prepare plot
+    if dict_algorithm['Debug_DEM'] :
+        for etai in dict_sample['L_etai']:
+            os.mkdir('Debug/Shear/Eta_'+str(etai.id))
 
 #-------------------------------------------------------------------------------
 

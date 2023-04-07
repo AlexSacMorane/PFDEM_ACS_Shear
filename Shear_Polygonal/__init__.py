@@ -231,7 +231,9 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
             print('i_DEM',dict_algorithm['i_DEM'],': Confinement',int(100*Fv/dict_sollicitations['Vertical_Confinement_Force']),'% Shear',round(Shear_strain,4),'('+str(int(100*Shear_strain/dict_sollicitations['Shear_strain_target']))+' %)')
             if dict_algorithm['Debug_DEM'] :
-                Owntools.Plot.Plot_Config_Sheared(dict_sample,dict_algorithm['i_DEM']) #change function here
+                Owntools.Plot.Plot_Config_Sheared(dict_sample, dict_algorithm['i_DEM']) #change function here
+                for etai in dict_sample['L_etai']:
+                    Owntools.Plot.Plot_Config_Sheared_etai(dict_sample, dict_algorithm['i_DEM'], etai)
 
         #Check stop conditions for DEM
         if Shear_strain >= dict_sollicitations['Shear_strain_target'] : #strain target reached

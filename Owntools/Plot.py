@@ -156,6 +156,38 @@ def Plot_Config_Sheared(dict_sample,i):
 
 #-------------------------------------------------------------------------------
 
+def Plot_Config_Sheared_etai(dict_sample, i, etai):
+    """
+    Plot loaded configuration during shearing.
+
+    Focus on one eta.
+
+        Input :
+            a sample dictionnary (a dict)
+            an iteration (a int)
+            an etai (an Eta)
+        Output :
+            Nothing, but a .png file is generated (a file)
+    """
+    L_color = ['red', 'royalblue', 'forestgreen', 'gold', 'hotpink', 'skyblue', 'chocolate', 'darkkhaki', 'darkorchid', 'silver', 'tan',  'yellowgreen', 'crimson']
+
+    plt.figure(1,figsize=(16,9))
+
+    #etas
+    im = plt.imshow(etai.etai_M, interpolation='nearest', extent=[min(dict_sample['x_L']),max(dict_sample['x_L']), min(dict_sample['y_L']),max(dict_sample['y_L'])], vmin = 0, vmax = 1)
+    plt.colorbar(im)
+    #grains
+    for grain in dict_sample['L_g']:
+        if grain.etai == etai.id  :
+            plt.plot(grain.l_border_x,grain.l_border_y,color=L_color[grain.etai],linewidth=3)
+    plt.title('Phase field and grains')
+    plt.axis('equal')
+
+    plt.savefig('Debug/Shear/Eta_'+str(etai.id)+'/Config_'+str(i)+'.png')
+    plt.close(1)
+
+#-------------------------------------------------------------------------------
+
 def Plot_Config_Confinement(dict_sample,i):
     """
     Plot loaded configuration during confinement.
