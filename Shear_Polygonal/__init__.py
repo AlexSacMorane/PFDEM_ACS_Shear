@@ -20,6 +20,7 @@ import Contact_gg
 import Contact_gimage
 import Owntools
 import Owntools.Plot
+import PhaseField
 
 
 #-------------------------------------------------------------------------------
@@ -225,7 +226,10 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
             #move solute
             Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
 
-        #add pf simulation (new module) and pf->DEM and DEM->PF
+        #pf simulation
+        #if dict_algorithm['i_DEM'] % dict_algorithm['i_pf_simulation'] == 0:
+        if False:
+            pf_simulation()
 
         #debug print and plot
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
