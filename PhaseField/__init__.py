@@ -10,7 +10,11 @@ This file contains functions used in the simulation to create and run phase fiel
 #Librairy
 #-------------------------------------------------------------------------------
 
+import os
+from pathlib import Path
+
 #Own
+import Owntools
 import Owntools.Compute
 import Owntools.Write
 
@@ -18,7 +22,7 @@ import Owntools.Write
 #Function
 #-------------------------------------------------------------------------------
 
-def pf_simulation():
+def pf_simulation(dict_algorithm, dict_material, dict_sample, dict_sollicitations):
     """
     Convert from DEM, prepare simulation, run simulation and convert to DEM.
 
@@ -27,6 +31,16 @@ def pf_simulation():
         Output :
 
     """
+    #plan simulation
+    L_folder = ['Data', 'Input', 'Output']
+    for folder in L_folder :
+        if not Path(folder).exists():
+            os.mkdir(folder)
+        else :
+            if dict_algorithm['clean_memory']:
+                shutil.rmtree(folder)
+                os.mkdir(folder)
+
     #compute data
     Owntools.Compute.Compute_Emec(dict_material, dict_sample, dict_sollicitations)
     Owntools.Compute.Compute_kc(dict_algorithm, dict_material, dict_sample)
@@ -39,9 +53,11 @@ def pf_simulation():
 
     #write .i
     Owntools.Write.Write_i(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
-    
+
     #run simulation
+    os.system('mpiexec -n '+str(dict_algorithm['np_proc'])+' ~/projects/moose/modules/combined/combined-opt -i '+dict_algorithm['namefile']+'_'+str(dict_algorithm['i_PFDEM'])+'.i')
 
     #sort files
+    j_str = Owntools.Sort_Files(dict_algorithm)
 
     #pf to dem
