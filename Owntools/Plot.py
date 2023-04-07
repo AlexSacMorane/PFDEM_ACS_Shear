@@ -180,7 +180,7 @@ def Plot_Config_Sheared_etai(dict_sample, i, etai):
     for grain in dict_sample['L_g']:
         if grain.etai == etai.id  :
             plt.plot(grain.l_border_x,grain.l_border_y,color=L_color[grain.etai],linewidth=3)
-    plt.title('Phase field and grains')
+    plt.title('Eta '+str(etai.id)+' and grains related')
     plt.axis('equal')
 
     plt.savefig('Debug/Shear/Eta_'+str(etai.id)+'/Config_'+str(i)+'.png')
