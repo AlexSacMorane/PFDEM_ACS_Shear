@@ -242,7 +242,10 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
             simulation_report.tac_2nd_tempo('Update phase fields')
             #move solute
             Owntools.Interpolate_solute_out_grains(dict_algorithm, dict_sample)
+            #run pf simulation
+            simulation_report.tic_2nd_tempo()
             pf_simulation()
+            simulation_report.tac_2nd_tempo('Run phase field simulation')
 
         #debug print and plot
         if dict_algorithm['i_DEM'] % dict_algorithm['i_print_plot'] == 0:
