@@ -109,6 +109,7 @@ def All_parameters():
     n_local = 40 #estimation number of node in one axis for a grain
     n_x = int(n_local * (x_box_max-x_box_min)/(2*R_mean)) #number of nodes in x-axis
     n_y = int(n_local * H_L_ratio*(x_box_max-x_box_min)/(2*R_mean)) #number of nodes in y-axis
+    i_pf_simulation = 500 #frequency to run a phase field simulation
 
     #Number of processor
     np_proc = 4
@@ -130,7 +131,7 @@ def All_parameters():
     top_height = 1.5*R_mean #top group
 
     #Periodic conditions
-    d_to_image = 2 * max(L_R) #distance to wall to generate images
+    d_to_image = 3 * max(L_R) #distance to wall to generate images
 
     #PID corrector to apply confinement force on Top group (used in IC generation)
     PID_kp = 10**(-7) #proportionnal to the error
@@ -152,6 +153,7 @@ def All_parameters():
     'factor_distribution_etai' : factor_distribution_etai,
     'n_x' : n_x,
     'n_y' : n_y,
+    'i_pf_simulation' : i_pf_simulation,
     'np_proc' : np_proc,
     'struct_element' : struct_element,
     'i_update_pf_solute' : i_update_pf_solute,
@@ -263,5 +265,61 @@ def generate_solute(dict_sample):
                     n_etais = n_etais + 1
             if n_etais >= 2:
                 dict_sample['solute_M'][l][c] = 0.1 #input
+
+#-------------------------------------------------------------------------------
+
+def compute_alpha(dict_geometry, dict_material, dict_sample, dict_sollicitations):
+    """
+    Compute the coefficient applied to mechanical energy term for pf formulation.
+
+    This term is computed considering 2 disk grains under the sollicitation force.
+
+        Input :
+            a geometry dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+            a sollicitations dictionnary (a dict)
+        Output :
+            Nothing, but dict_sollicitations get a new attribut (a float)
+    """
+    k = 4/3*dict_material['Y']/2/(1-dict_material['nu']**2)
+    overlap = (dict_sollicitations['Vertical_Confinement_Force']/k)**(2/3)
+    #g1
+    center_1 = np.array([np.mean(dict_sample['x_L'])-dict_geometry['R_mean']+overlap/2, np.mean(dict_sample['y_L'])])
+    g1_ic_disk = Create_IC.Grain_ic.Grain_Tempo(0, center_1, dict_geometry['R_mean'], dict_material)
+    g1_ic_polygonal = Create_IC_Polygonal.Grain_ic_polygonal.Grain_Tempo_Polygonal(g1_ic_disk, dict_geometry['discretization'])
+    g1_tempo = Grain.Grain(g1_ic_polygonal)
+    g1_tempo.build_etai_M(dict_material, dict_sample)
+    #g2
+    center_2 = np.array([np.mean(dict_sample['x_L'])+dict_geometry['R_mean']-overlap/2, np.mean(dict_sample['y_L'])])
+    g2_ic_disk = Create_IC.Grain_ic.Grain_Tempo(1, center_2, dict_geometry['R_mean'], dict_material)
+    g2_ic_polygonal = Create_IC_Polygonal.Grain_ic_polygonal.Grain_Tempo_Polygonal(g2_ic_disk, dict_geometry['discretization'])
+    g2_tempo = Grain.Grain(g2_ic_polygonal)
+    g2_tempo.build_etai_M(dict_material, dict_sample)
+    #compute the sum_min_etai
+    #extract a spatial zone
+    x_min = center_1[0]-dict_geometry['R_mean']-dict_material['w']
+    x_max = center_2[0]+dict_geometry['R_mean']+dict_material['w']
+    y_min = center_1[1]-dict_geometry['R_mean']-dict_material['w']
+    y_max = center_1[1]+dict_geometry['R_mean']+dict_material['w']
+    #look for this part inside the global mesh
+    #create search list
+    x_L_search_min = abs(np.array(dict_sample['x_L'])-x_min)
+    x_L_search_max = abs(np.array(dict_sample['x_L'])-x_max)
+    y_L_search_min = abs(np.array(dict_sample['y_L'])-y_min)
+    y_L_search_max = abs(np.array(dict_sample['y_L'])-y_max)
+    #get index
+    i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+    i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+    i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+    i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+    #Initialisation
+    sum_min_etai = 0
+    #compute the sum over the sample of the minimum of etai
+    for l in range(i_y_min, i_y_max):
+        for c in range(i_x_min, i_x_max):
+            sum_min_etai = sum_min_etai + min(g1_tempo.etai_M[-1-l][c],g2_tempo.etai_M[-1-l][c])
+    #Add element in dict
+    dict_sollicitations['alpha'] = 0.06*sum_min_etai
 
 #-------------------------------------------------------------------------------
