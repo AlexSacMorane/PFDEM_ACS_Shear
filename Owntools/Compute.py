@@ -17,7 +17,7 @@ from scipy.ndimage import binary_dilation
 
 #-------------------------------------------------------------------------------
 
-def Compute_Emec(dict_material, dict_sample, dict_sollicitation):
+def Compute_Emec(dict_material, dict_sample, dict_sollicitations):
     '''
     Compute the mechanical energy over the sample.
 
@@ -59,7 +59,7 @@ def Compute_Emec(dict_material, dict_sample, dict_sollicitation):
                 sum_min_etai = sum_min_etai + min(contact.g1.etai_M[-1-l][c],contact.g2.etai_M[-1-l][c])
         if sum_min_etai != 0 :
             #compute the variable e_mec
-            e_mec = dict_sollicitation['alpha']/sum_min_etai
+            e_mec = dict_sollicitations['alpha']/sum_min_etai
         else :
             e_mec = 0
         #compute the distribution of the mechanical energy
