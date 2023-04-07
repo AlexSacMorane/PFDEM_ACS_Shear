@@ -69,3 +69,55 @@ def Compute_Emec(dict_material, dict_sample, dict_sollicitations):
 
     #Update element in dictionnary
     dict_sample['Emec_M'] = Emec_M
+
+#-------------------------------------------------------------------------------
+
+def Compute_kc(dict_algorithm, dict_material, dict_sample):
+    '''
+    Compute the solute diffusion coefficient field in the sample.
+
+    Here, a dilation method is applied. For all node, a Boolean variable is defined.
+    This variable is True at least 2 eta_i are greater than 0.5 (in the contact zone).
+                  is True all etai are lower than 0.5 (in the pore zone).
+                  is False else.
+
+    A dilation method is applied, the size of the structural element is the main case.
+
+    The diffusion map is built on the Boolean map. If the variable is True, the diffusion is kc, else 0.
+
+        Input :
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dict)
+        Output :
+            Nothing but the dictionnary gets an updated value for the solute diffusion coefficient map (a nx x ny numpy array)
+    '''
+    #Initialisation
+    on_off_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))), dtype = bool)
+
+    #compute the on off map
+    for l in range(len(dict_sample['y_L'])):
+        for c in range(len(dict_sample['x_L'])):
+            n_etai_over_0_5 = 0 #counter
+            for etai in dict_sample['L_etai'] :
+                if etai.etai_M[-1-l][c] > 0.5 :
+                    n_etai_over_0_5 = n_etai_over_0_5 + 1
+            #at a contact
+            if n_etai_over_0_5 >= 2:
+                on_off_M[-l-1][c] = True
+            #in the pore space
+            elif n_etai_over_0_5 == 0:
+                on_off_M[-l-1][c] = True
+
+    #dilatation
+    dilated_M = binary_dilation(on_off_M, dict_algorithm['struct_element'])
+
+    #compute the map of the solute diffusion coefficient
+    kc_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+    for l in range(len(dict_sample['y_L'])):
+        for c in range(len(dict_sample['x_L'])):
+            if dilated_M[-1-l][c] :
+                kc_M[-1-l][c] = dict_material['kappa_c']
+
+    #Update element in dictionnary
+    dict_sample['kc_M'] = kc_M
