@@ -274,6 +274,8 @@ def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict
         Output :
             Nothing, but dictionnaries are updated
     '''
+    #compute coefficient alpha for phase field
+    User.compute_alpha(dict_geometry, dict_material, dict_sample, dict_sollicitations)
     #shear sample
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo()
