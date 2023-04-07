@@ -38,7 +38,8 @@ def pf_simulation():
     Owntools.Write.Write_Emec_txt(dict_algorithm, dict_sample)
 
     #write .i
-
+    Owntools.Write.Write_i(dict_algorithm, dict_material, dict_sample, dict_sollicitations)
+    
     #run simulation
 
     #sort files
