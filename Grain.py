@@ -211,7 +211,7 @@ class Grain:
 
 #---------------------------------------------------------------------------
 
-  def build_etai_M(self,dict_material,dict_sample):
+  def build_etai_M(self, dict_algorithm, dict_material, dict_sample):
         '''
         Build the phase field for one grain.
 
@@ -219,6 +219,7 @@ class Grain:
 
             Input :
                 itself (a grain)
+                an algorithm dictionnary (a dictionnary)
                 a material dictionnary (a dictionnary)
                 a sample dictionnary (a dictionnary)
             Output :
@@ -505,6 +506,51 @@ class Grain:
                     etai_M_extended[-1-l][c] = q
 
     self.etai_M = etai_M_extended[:,len(dict_sample['x_L'])-i_bc_left-1:2*len(dict_sample['x_L'])-i_bc_left-1].copy()
+
+#---------------------------------------------------------------------------
+
+  def move_grain_isophase(self, dict_algorithm, dict_material, dict_sample):
+    '''
+    Move the grain by updating the phase field of the grain.
+
+        Input :
+            itself (a grain)
+            an algorithm dictionnary (a dict)
+            a material dictionnary (a dict)
+            a sample dictionnary (a dictionnary)
+        Output :
+            Nothing but the grain gets an updated attribute (a n_y x n_x numpy array)
+    '''
+    #prepare
+    self.etai_M = np.array(np.zeros((len(dict_sample['y_L']),len(dict_sample['x_L']))))
+
+    #extract zone
+    x_min = min(self.l_eta_0_01_x)
+    x_max = max(self.l_eta_0_01_x)
+    y_min = min(self.l_eta_0_01_y)
+    y_max = max(self.l_eta_0_01_y)
+    #bc ?
+
+
+    #look for this part inside the global mesh
+    #create search list
+    x_L_search_min = abs(np.array(dict_sample['x_L'])-x_min)
+    x_L_search_max = abs(np.array(dict_sample['x_L'])-x_max)
+    y_L_search_min = abs(np.array(dict_sample['y_L'])-y_min)
+    y_L_search_max = abs(np.array(dict_sample['y_L'])-y_max)
+    #get index
+    i_x_min = list(x_L_search_min).index(min(x_L_search_min))
+    i_x_max = list(x_L_search_max).index(min(x_L_search_max))
+    i_y_min = list(y_L_search_min).index(min(y_L_search_min))
+    i_y_max = list(y_L_search_max).index(min(y_L_search_max))
+
+    #iteration on the mesh
+    for l in range(i_y_min, i_y_max+1):
+        for c in range(i_x_min, i_x_max+1):
+
+
+
+
 
 #-------------------------------------------------------------------------------
 

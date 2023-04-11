@@ -243,7 +243,7 @@ def define_etai(dict_algorithm, dict_material, dict_sample, simulation_report):
     simulation_report.tic_tempo()
     #build phase field for grains
     for grain in dict_sample['L_g']:
-        grain.build_etai_M(dict_material,dict_sample)
+        grain.build_etai_M(dict_algorithm, dict_material, dict_sample)
     #build etais
     dict_sample['L_etai'] = list([])
     for group in ['Top', 'Current', 'Bottom'] :
@@ -275,7 +275,7 @@ def shear_sample(dict_algorithm, dict_geometry, dict_material, dict_sample, dict
             Nothing, but dictionnaries are updated
     '''
     #compute coefficient alpha for phase field
-    User.compute_alpha(dict_geometry, dict_material, dict_sample, dict_sollicitations)
+    #User.compute_alpha(dict_geometry, dict_material, dict_sample, dict_sollicitations)
     #shear sample
     simulation_report.write_and_print('\nShearing the sample\n', 'Shearing the sample')
     simulation_report.tic_tempo()
