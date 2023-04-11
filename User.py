@@ -117,8 +117,11 @@ def All_parameters():
     #structural matrix to build diffusion map and available node map
     struct_element = np.array(np.ones((int(n_local/20), int(n_local/20))))
 
-    #update solute map
-    i_update_pf_solute = 50
+    #update solute and phase map
+    i_update_pf_solute = 25
+
+    #method to update pf
+    method_pf_update = 'interpolation' #interpolation or isophases
 
     #DEM parameters
     dt_DEM_crit = math.pi*min(L_R)/(0.16*nu+0.88)*math.sqrt(rho*(2+2*nu)/Y) #s critical time step from O'Sullivan 2011
@@ -157,6 +160,7 @@ def All_parameters():
     'np_proc' : np_proc,
     'struct_element' : struct_element,
     'i_update_pf_solute' : i_update_pf_solute,
+    'method_pf_update' : method_pf_update,
     'dt_DEM_crit' : dt_DEM_crit,
     'dt_DEM' : dt_DEM,
     'factor_neighborhood' : factor_neighborhood,
