@@ -62,9 +62,10 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
     #Switch on tracks
     for grain in dict_sample['L_g'] :
         #track rigid body motion to move pf
-        grain.track_rbm_pf_interpolation = True
-        grain.u_pf_interpolation = np.array([0,0])
-        grain.dtheta_pf_interpolation = 0
+        if dict_algorithm['method_pf_update'] == 'interpolation' :
+            grain.track_rbm_pf_interpolation = True
+            grain.u_pf_interpolation = np.array([0,0])
+            grain.dtheta_pf_interpolation = 0
         #track total displacement of grains (plot)
         grain.track_u = True
         grain.total_ux = 0
@@ -215,10 +216,12 @@ def DEM_shear_load(dict_algorithm, dict_geometry, dict_material, dict_sample, di
             #move pf for each grain with rbm
             simulation_report.tic_2nd_tempo()
             for i_grain in range(len(dict_sample['L_g'])) :
-                #add bc
-                dict_sample['L_g'][i_grain].move_grain_interpolation(dict_algorithm, dict_material, dict_sample)
-                dict_sample['L_g'][i_grain].u_pf_interpolation = np.array([0,0])
-                dict_sample['L_g'][i_grain].dtheta_pf_interpolation = 0
+                if dict_algorithm['method_pf_update'] == 'interpolation' :
+                    dict_sample['L_g'][i_grain].move_grain_interpolation(dict_algorithm, dict_material, dict_sample)
+                    dict_sample['L_g'][i_grain].u_pf_interpolation = np.array([0,0])
+                    dict_sample['L_g'][i_grain].dtheta_pf_interpolation = 0
+                elif dict_algorithm['method_pf_update'] == 'isophases' :
+                    dict_sample['L_g'][i_grain].move_grain_isophase(dict_algorithm, dict_material, dict_sample)
             #update etai
             for etai in dict_sample['L_etai']:
                 etai.update_etai_M(dict_sample['L_g'])
